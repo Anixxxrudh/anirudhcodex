@@ -20,7 +20,7 @@ export default function Navbar({ mode, setMode, scrollToSection }: NavbarProps) 
   return (
     <nav className="navbar">
       <span className="navbar-brand" onClick={() => { setMode("home"); scrollToSection("home") }}>
-        THE PROTOCOL
+        THEANIRUDHPROTOCOL
       </span>
       <div className="navbar-divider" />
       {NAV_ITEMS.map(({ key, label }) => (

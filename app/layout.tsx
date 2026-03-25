@@ -15,20 +15,20 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Anirudh Codex — Physics, Energy, and Creative Systems",
+  title: "TheAnirudhProtocol — Physics, Energy, and Creative Systems",
   description:
     "A cinematic portfolio exploring astrophysics, renewable energy research, music, and outdoor exploration.",
   openGraph: {
-    title: "Anirudh Codex — Physics, Energy, and Creative Systems",
+    title: "TheAnirudhProtocol — Physics, Energy, and Creative Systems",
     description:
       "A cinematic portfolio exploring astrophysics, renewable energy research, music, and outdoor exploration.",
     url: "https://anirudhcodex.vercel.app",
-    siteName: "Anirudh Codex",
+    siteName: "TheAnirudhProtocol",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Anirudh Codex — Physics, Energy, and Creative Systems",
+    title: "TheAnirudhProtocol — Physics, Energy, and Creative Systems",
     description:
       "A cinematic portfolio exploring astrophysics, renewable energy research, music, and outdoor exploration.",
   },
