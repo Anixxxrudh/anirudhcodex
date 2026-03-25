@@ -144,7 +144,7 @@ export default function Page() {
 
         {/* ── HOME ──────────────────────────────────────────────────── */}
         <section ref={homeRef} className="home-section">
-          <h1 className="home-name">THEANIRUDHPROTOCOL</h1>
+          <h1 className="home-name">THE ANIRUDH PROTOCOL</h1>
           <p className="home-tagline">
             Astrophysics&nbsp;&nbsp;·&nbsp;&nbsp;Photovoltaics&nbsp;&nbsp;·&nbsp;&nbsp;Climbing&nbsp;&nbsp;·&nbsp;&nbsp;Music
           </p>
@@ -161,7 +161,7 @@ export default function Page() {
                 and motion converge.
               </p>
               <p>
-                This is TheAnirudhProtocol.
+                This is The Anirudh Protocol.
               </p>
             </div>
           </div>
