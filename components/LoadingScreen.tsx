@@ -2,7 +2,8 @@
 import { useEffect, useRef, useState } from "react"
 
 export default function LoadingScreen({ onComplete }: { onComplete: () => void }) {
-  const [phase, setPhase] = useState<"cursor"|"typing"|"stars"|"warp"|"done">("cursor")
+  const [phase, setPhase] = useState<"cursor"|"typing"|"stars">("cursor")
+  const [fading, setFading] = useState(false)
   const [typed, setTyped]   = useState("")
   const canvasRef           = useRef<HTMLCanvasElement>(null)
   const full = "INITIALIZING THE ANIRUDH PROTOCOL..."
@@ -28,9 +29,9 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
     return () => clearInterval(iv)
   }, [phase])
 
-  // Stars canvas
+  // Stars canvas — only triggered once when phase becomes "stars"
   useEffect(() => {
-    if (phase !== "stars" && phase !== "warp") return
+    if (phase !== "stars") return
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext("2d")!
@@ -89,25 +90,25 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
 
     draw()
 
-    if (phase === "stars") {
-      setTimeout(() => {
-        isWarping = true
-        setPhase("warp")
-      }, 1200)
+    const t = setTimeout(() => {
+      isWarping = true
+      setFading(true)
+    }, 1200)
+
+    return () => {
+      clearTimeout(t)
+      cancelAnimationFrame(animId)
     }
-
-    return () => cancelAnimationFrame(animId)
   }, [phase])
-
-  if (phase === "done") return null
 
   return (
     <div style={{
       position: "fixed", inset: 0, background: "#000",
       zIndex: 10000, display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center",
-      transition: phase === "warp" ? "opacity 0.8s ease" : "none",
-      opacity: phase === "warp" ? 0 : 1,
+      transition: fading ? "opacity 0.8s ease" : "none",
+      opacity: fading ? 0 : 1,
+      pointerEvents: fading ? "none" : "auto",
     }}>
       <canvas ref={canvasRef} style={{ position: "absolute", inset: 0 }} />
 
@@ -123,7 +124,7 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
         {phase === "cursor" && (
           <span style={{ animation: "blink 1s step-end infinite" }}>_</span>
         )}
-        {(phase === "typing" || phase === "stars" || phase === "warp") && (
+        {(phase === "typing" || phase === "stars") && (
           <span>
             {typed}
             <span style={{ animation: "blink 0.7s step-end infinite" }}>_</span>
