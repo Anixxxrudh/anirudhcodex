@@ -1,5 +1,7 @@
 "use client"
 import { useEffect, useRef, useState } from "react"
+import TiltCard from "./TiltCard"
+import ScrambleText from "./ScrambleText"
 
 const MILESTONES = [
   { year: "2023", text: "Started undergraduate journey at University of Toledo — Physics / Astrophysics track." },
@@ -35,7 +37,7 @@ export default function Timeline() {
   return (
     <section className="timeline-section">
       <div className="section-eyebrow">Journey</div>
-      <h2 className="section-title">The Timeline</h2>
+      <ScrambleText text="The Timeline" className="section-title" />
 
       <div className="timeline-track">
         <div className="timeline-line" />
@@ -46,10 +48,10 @@ export default function Timeline() {
             className={`timeline-item ${i % 2 === 0 ? "timeline-left" : "timeline-right"} ${visible[i] ? "timeline-visible" : ""}`}
           >
             <div className="timeline-dot" />
-            <div className="timeline-card">
+            <TiltCard className="timeline-card">
               <span className="timeline-year">{m.year}</span>
               <p className="timeline-text">{m.text}</p>
-            </div>
+            </TiltCard>
           </div>
         ))}
       </div>
