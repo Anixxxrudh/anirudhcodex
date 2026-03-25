@@ -10,7 +10,7 @@ export default function OGImage() {
     (
       <div
         style={{
-          background: "#000",
+          background: "#020810",
           width: "100%",
           height: "100%",
           display: "flex",
@@ -19,37 +19,92 @@ export default function OGImage() {
           justifyContent: "center",
           fontFamily: "sans-serif",
           position: "relative",
+          overflow: "hidden",
         }}
       >
-        {/* Blue glow behind title */}
+        {/* Dot grid background */}
         <div
           style={{
             position: "absolute",
-            width: 600,
-            height: 200,
-            background: "radial-gradient(ellipse, rgba(77,184,255,0.25) 0%, transparent 70%)",
-            borderRadius: "50%",
+            inset: 0,
+            backgroundImage:
+              "radial-gradient(circle, rgba(77,184,255,0.18) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+            opacity: 0.5,
+            display: "flex",
           }}
         />
 
+        {/* Corner brackets */}
+        {/* top-left */}
+        <div style={{ position: "absolute", top: 36, left: 48, width: 40, height: 40, borderTop: "1.5px solid rgba(77,184,255,0.4)", borderLeft: "1.5px solid rgba(77,184,255,0.4)", display: "flex" }} />
+        {/* top-right */}
+        <div style={{ position: "absolute", top: 36, right: 48, width: 40, height: 40, borderTop: "1.5px solid rgba(77,184,255,0.4)", borderRight: "1.5px solid rgba(77,184,255,0.4)", display: "flex" }} />
+        {/* bottom-left */}
+        <div style={{ position: "absolute", bottom: 36, left: 48, width: 40, height: 40, borderBottom: "1.5px solid rgba(77,184,255,0.4)", borderLeft: "1.5px solid rgba(77,184,255,0.4)", display: "flex" }} />
+        {/* bottom-right */}
+        <div style={{ position: "absolute", bottom: 36, right: 48, width: 40, height: 40, borderBottom: "1.5px solid rgba(77,184,255,0.4)", borderRight: "1.5px solid rgba(77,184,255,0.4)", display: "flex" }} />
+
+        {/* Central glow */}
         <div
           style={{
-            fontSize: 64,
+            position: "absolute",
+            width: 700,
+            height: 300,
+            background: "radial-gradient(ellipse, rgba(77,184,255,0.18) 0%, transparent 70%)",
+            borderRadius: "50%",
+            display: "flex",
+          }}
+        />
+
+        {/* Eyebrow */}
+        <div
+          style={{
+            fontSize: 13,
+            color: "rgba(77,184,255,0.7)",
+            letterSpacing: "0.4em",
+            textTransform: "uppercase",
+            marginBottom: 24,
+          }}
+        >
+          PORTFOLIO · 2026
+        </div>
+
+        {/* Title */}
+        <div
+          style={{
+            fontSize: 72,
             fontWeight: 900,
             color: "#fff",
-            letterSpacing: "0.08em",
+            letterSpacing: "0.06em",
             textAlign: "center",
-            lineHeight: 1.1,
+            lineHeight: 1.05,
+            textShadow: "0 0 80px rgba(77,184,255,0.4)",
           }}
         >
           THE ANIRUDH PROTOCOL
         </div>
 
+        {/* Divider */}
         <div
           style={{
-            fontSize: 22,
-            color: "rgba(255,255,255,0.38)",
-            letterSpacing: "0.3em",
+            display: "flex",
+            alignItems: "center",
+            gap: 16,
+            marginTop: 32,
+          }}
+        >
+          <div style={{ width: 60, height: 1, background: "rgba(77,184,255,0.35)", display: "flex" }} />
+          <div style={{ width: 5, height: 5, borderRadius: "50%", background: "rgba(77,184,255,0.7)", display: "flex" }} />
+          <div style={{ width: 60, height: 1, background: "rgba(77,184,255,0.35)", display: "flex" }} />
+        </div>
+
+        {/* Tagline */}
+        <div
+          style={{
+            fontSize: 20,
+            color: "rgba(255,255,255,0.45)",
+            letterSpacing: "0.28em",
             marginTop: 28,
             textTransform: "uppercase",
           }}
@@ -57,27 +112,17 @@ export default function OGImage() {
           Astrophysics · Photovoltaics · Climbing · Music
         </div>
 
-        {/* Decorative line */}
-        <div
-          style={{
-            width: 120,
-            height: 1,
-            background: "rgba(77,184,255,0.4)",
-            marginTop: 40,
-          }}
-        />
-
+        {/* Bottom URL */}
         <div
           style={{
             position: "absolute",
-            bottom: 40,
-            right: 60,
-            fontSize: 15,
-            color: "rgba(77,184,255,0.5)",
-            letterSpacing: "0.15em",
+            bottom: 44,
+            fontSize: 14,
+            color: "rgba(77,184,255,0.45)",
+            letterSpacing: "0.18em",
           }}
         >
-          theanirudhprotocol.vercel.app
+          anirudhcodex.vercel.app
         </div>
       </div>
     ),
