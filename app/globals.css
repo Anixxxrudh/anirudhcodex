@@ -17,14 +17,15 @@
   --border-hover: rgba(255,255,255,0.28);
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; height: 100%; }
 
 body {
   margin: 0;
   background: #000;
   font-family: var(--font-body);
   color: var(--c-white);
-  overflow-x: hidden;
+  overflow: hidden;
+  height: 100%;
   cursor: none; /* custom cursor */
 }
 
@@ -253,7 +254,7 @@ section {
 
 .about-grid {
   display: grid;
-  grid-template-columns: 200px 1fr 1.6fr;
+  grid-template-columns: 280px 1fr 1.6fr;
   gap: 48px;
   max-width: 1160px;
   width: 100%;
@@ -1475,27 +1476,28 @@ section {
 /* ─── ABOUT PHOTO ───────────────────────────────────────────────────── */
 .about-photo-wrapper {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 280px;
+  height: 280px;
   flex-shrink: 0;
   align-self: center;
 }
 .about-photo {
-  width: 200px;
-  height: 200px;
+  width: 280px;
+  height: 280px;
   object-fit: cover;
-  border-radius: 50%;
-  border: 1px solid rgba(77,184,255,0.3);
-  filter: grayscale(20%) contrast(1.05);
+  object-position: center top;
+  border-radius: 8px;
+  border: 1px solid rgba(77,184,255,0.35);
+  filter: grayscale(15%) contrast(1.08);
   position: relative;
   z-index: 1;
   display: block;
 }
 .about-photo-glow {
   position: absolute;
-  inset: -12px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(77,184,255,0.15) 0%, transparent 70%);
+  inset: -16px;
+  border-radius: 12px;
+  background: radial-gradient(circle, rgba(77,184,255,0.18) 0%, transparent 70%);
   z-index: 0;
   animation: pulseGlow 3s ease-in-out infinite;
 }
@@ -1504,7 +1506,8 @@ section {
   50%      { opacity: 1;   transform: scale(1.05); }
 }
 @media (max-width: 768px) {
-  .about-photo-wrapper { margin: 0 auto 32px; }
+  .about-photo-wrapper { margin: 0 auto 32px; width: 220px; height: 220px; }
+  .about-photo { width: 220px; height: 220px; }
 }
 
 /* ─── LAB IMAGE ─────────────────────────────────────────────────────── */
@@ -1631,4 +1634,112 @@ section {
   z-index: 9998;
   transform: translate(-50%, -50%);
   opacity: 0;
+}
+
+/* ─── SNAP SCROLL ────────────────────────────────────────────────────── */
+.snap-container {
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  z-index: 1;
+}
+
+.snap-section {
+  scroll-snap-align: start;
+  min-height: 100vh;
+  position: relative;
+}
+
+.snap-content {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.snap-content.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── SECTION INDICATOR DOTS ─────────────────────────────────────────── */
+.section-dots {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 150;
+}
+
+.section-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  cursor: none;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 0;
+  outline: none;
+  box-shadow: none;
+}
+.section-dot.active {
+  background: #4db8ff;
+  box-shadow: 0 0 10px rgba(77,184,255,0.8);
+  transform: scale(1.6);
+}
+.section-dot:hover {
+  background: rgba(255,255,255,0.5);
+}
+
+@media (max-width: 768px) {
+  .section-dots { right: 10px; gap: 7px; }
+  .section-dot  { width: 5px; height: 5px; }
+}
+
+/* ─── CURRENT SECTION LABEL ──────────────────────────────────────────── */
+.current-section-label {
+  position: fixed;
+  bottom: 28px;
+  left: 32px;
+  font-family: var(--font-display);
+  font-size: 0.5rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  z-index: 150;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+/* ─── SWIPE HINT ─────────────────────────────────────────────────────── */
+.swipe-hint {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  animation: swipeBounce 2s ease-in-out infinite;
+}
+.swipe-hint-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, rgba(77,184,255,0.6));
+}
+.swipe-hint-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(77,184,255,0.6);
+}
+@keyframes swipeBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0);   opacity: 0.6; }
+  50%       { transform: translateX(-50%) translateY(8px); opacity: 1;   }
 }
