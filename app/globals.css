@@ -35,34 +35,38 @@ canvas {
   pointer-events: none;
 }
 
-/* ─── CUSTOM CURSOR ─────────────────────────────────────────────────── */
-#cursor-dot,
-#cursor-ring {
+/* ─── ATOM CURSOR ───────────────────────────────────────────────────── */
+#cursor-nucleus,
+#cursor-orbit,
+#cursor-electron {
   position: fixed;
-  border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%);
-  transition: opacity 0.3s;
 }
-#cursor-dot {
-  width: 6px;
-  height: 6px;
+
+#cursor-nucleus {
+  width: 5px;
+  height: 5px;
   background: #fff;
-  box-shadow: 0 0 8px rgba(77, 184, 255, 0.9);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(77,184,255,0.9);
 }
-#cursor-ring {
-  width: 32px;
-  height: 32px;
-  border: 1px solid rgba(77, 184, 255, 0.55);
-  transition: width 0.2s, height 0.2s, border-color 0.2s;
-  box-shadow: 0 0 12px rgba(77, 184, 255, 0.15);
+
+#cursor-orbit {
+  border: 1px solid rgba(77,184,255,0.45);
+  border-radius: 50%;
+  width: 28px;
+  height: 13px;
+  transition: border-color 0.2s ease, width 0.2s ease, height 0.2s ease;
 }
-#cursor-ring.hovered {
-  width: 48px;
-  height: 48px;
-  border-color: rgba(77, 184, 255, 0.9);
-  box-shadow: 0 0 20px rgba(77, 184, 255, 0.35);
+
+#cursor-electron {
+  width: 4px;
+  height: 4px;
+  background: var(--c-blue);
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(77,184,255,0.9);
 }
 
 .navbar-brand {
@@ -638,7 +642,54 @@ section {
 }
 .contact-link--secondary:hover { opacity: 1; }
 
-.resume-block {
+/* ─── SOCIAL ROW ────────────────────────────────────────────────────── */
+.social-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  max-width: 500px;
+  margin-top: 24px;
+}
+
+.social-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 20px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.02);
+  text-decoration: none;
+  transition: all 0.25s ease;
+  flex: 1;
+  min-width: 110px;
+  cursor: none;
+}
+.social-link:hover {
+  border-color: rgba(77,184,255,0.4);
+  background: rgba(77,184,255,0.05);
+  transform: translateY(-2px);
+}
+.social-link--music:hover {
+  border-color: rgba(255, 70, 70, 0.45);
+  background: rgba(255, 70, 70, 0.04);
+}
+
+.social-label {
+  font-family: var(--font-display);
+  font-size: 0.5rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.28);
+}
+.social-handle {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.65);
+}
+
+/* ─── RESUME ─────────────────────────────────────────────────────────── */
   margin-top: 60px;
   display: flex;
   flex-direction: column;
@@ -701,6 +752,6 @@ section {
   .navbar { gap: 6px; padding: 10px 12px; }
   .navbar button { font-size: 0.52rem; padding: 6px 10px; letter-spacing: 0.1em; }
   .crawl-wrapper { display: none; }
-  #cursor-dot, #cursor-ring { display: none; }
+  #cursor-nucleus, #cursor-orbit, #cursor-electron { display: none; }
   body { cursor: auto; }
 }

@@ -43,39 +43,62 @@ export default function Page() {
     return () => observer.disconnect()
   }, [])
 
-  // ─── CUSTOM CURSOR ────────────────────────────────────────────────
+  // ─── ATOM CURSOR ──────────────────────────────────────────────────
   useEffect(() => {
-    const dot  = document.getElementById("cursor-dot")
-    const ring = document.getElementById("cursor-ring")
-    if (!dot || !ring) return
+    const nucleus = document.getElementById("cursor-nucleus")
+    const orbit   = document.getElementById("cursor-orbit")
+    const electron = document.getElementById("cursor-electron")
+    if (!nucleus || !orbit || !electron) return
 
-    let ringX = 0, ringY = 0
-    let curX  = 0, curY  = 0
+    let orbitX = 0, orbitY = 0
+    let curX = 0, curY = 0
+    let angle = 0
     let animId: number = 0
+    let isHovered = false
 
     const onMove = (e: MouseEvent) => {
       curX = e.clientX
       curY = e.clientY
-      dot.style.left = curX + "px"
-      dot.style.top  = curY + "px"
+      nucleus.style.left = curX + "px"
+      nucleus.style.top  = curY + "px"
     }
 
-    const onEnter = () => ring.classList.add("hovered")
-    const onLeave = () => ring.classList.remove("hovered")
+    const onEnter = () => { isHovered = true }
+    const onLeave = () => { isHovered = false }
 
-    const loop = () => {
-      ringX += (curX - ringX) * 0.12
-      ringY += (curY - ringY) * 0.12
-      ring.style.left = ringX + "px"
-      ring.style.top  = ringY + "px"
-      animId = requestAnimationFrame(loop)
-    }
-
-    const interactables = document.querySelectorAll("button, a, .project-card, .contact-link, .resume-btn")
+    const interactables = document.querySelectorAll("button, a, .project-card, .contact-link, .resume-btn, .navbar-brand")
     interactables.forEach((el) => {
       el.addEventListener("mouseenter", onEnter)
       el.addEventListener("mouseleave", onLeave)
     })
+
+    const loop = () => {
+      // Orbit lags behind cursor
+      orbitX += (curX - orbitX) * 0.1
+      orbitY += (curY - orbitY) * 0.1
+
+      // Electron orbits continuously, faster on hover
+      angle += isHovered ? 0.08 : 0.04
+      const radius = isHovered ? 20 : 14
+      const eX = orbitX + Math.cos(angle) * radius
+      const eY = orbitY + Math.sin(angle) * (radius * 0.45)
+
+      orbit.style.left   = orbitX + "px"
+      orbit.style.top    = orbitY + "px"
+      orbit.style.width  = `${radius * 2}px`
+      orbit.style.height = `${radius * 0.9}px`
+      orbit.style.borderColor = isHovered
+        ? "rgba(77,184,255,0.8)"
+        : "rgba(77,184,255,0.45)"
+
+      electron.style.left = eX + "px"
+      electron.style.top  = eY + "px"
+      electron.style.boxShadow = isHovered
+        ? "0 0 8px rgba(77,184,255,1)"
+        : "0 0 5px rgba(77,184,255,0.8)"
+
+      animId = requestAnimationFrame(loop)
+    }
 
     window.addEventListener("mousemove", onMove)
     loop()
@@ -106,9 +129,10 @@ export default function Page() {
 
   return (
     <>
-      {/* Custom cursor */}
-      <div id="cursor-dot"  />
-      <div id="cursor-ring" />
+      {/* Atom cursor */}
+      <div id="cursor-nucleus" />
+      <div id="cursor-orbit"   />
+      <div id="cursor-electron" />
 
       {/* Background */}
       <BackgroundCanvas mode={mode} />
@@ -355,6 +379,26 @@ export default function Page() {
             <a href="https://github.com/Anixxxrudh" target="_blank" rel="noreferrer" className="contact-link">
               <span className="contact-link-label">GitHub</span>
               <span className="contact-link-value">github.com/Anixxxrudh</span>
+            </a>
+          </div>
+
+          {/* Social row */}
+          <div className="social-row">
+            <a href="https://instagram.com/anixxrudh" target="_blank" rel="noreferrer" className="social-link">
+              <span className="social-label">Instagram</span>
+              <span className="social-handle">@anixxrudh</span>
+            </a>
+            <a href="https://instagram.com/theLostplankton" target="_blank" rel="noreferrer" className="social-link">
+              <span className="social-label">Art</span>
+              <span className="social-handle">@theLostplankton</span>
+            </a>
+            <a href="https://instagram.com/_chu.climbs" target="_blank" rel="noreferrer" className="social-link">
+              <span className="social-label">Climbing</span>
+              <span className="social-handle">@_chu.climbs</span>
+            </a>
+            <a href="https://music.apple.com/us/playlist/my-axiom/pl.u-8aAVoV6HvRXxB1z" target="_blank" rel="noreferrer" className="social-link social-link--music">
+              <span className="social-label">Apple Music</span>
+              <span className="social-handle">My Axiom — Playlist</span>
             </a>
           </div>
 
