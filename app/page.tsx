@@ -19,7 +19,10 @@ import CounterSection  from "../components/CounterSection"
 import QuotesSection   from "../components/QuotesSection"
 import CommandPalette    from "../components/CommandPalette"
 import ContextMenu       from "../components/ContextMenu"
-import SolarCellCursor   from "../components/SolarCellCursor"
+import CursorSystem      from "../components/CursorSystem"
+import CollabSection     from "../components/CollabSection"
+import WeatherWidget     from "../components/WeatherWidget"
+import ShareButton       from "../components/ShareButton"
 
 const SECTIONS = [
   { key: "home",     label: "HOME",     mode: "home"     },
@@ -33,14 +36,26 @@ const SECTIONS = [
   { key: "now",      label: "NOW",      mode: "home"     },
   { key: "skills",   label: "SKILLS",   mode: "physics"  },
   { key: "blog",     label: "WRITING",  mode: "about"    },
+  { key: "collab",   label: "COLLAB",   mode: "about"    },
   { key: "quotes",   label: "QUOTES",   mode: "about"    },
   { key: "contact",  label: "CONTACT",  mode: "contact"  },
 ]
+
+const FLASH_CLASS: Record<string, string> = {
+  home:     "flash-blue",
+  about:    "flash-blue",
+  projects: "flash-blue",
+  physics:  "flash-blue",
+  music:    "flash-orange",
+  climbing: "flash-green",
+  contact:  "flash-blue",
+}
 
 export default function Page() {
   const [loaded,        setLoaded]        = useState(false)
   const [scrolled,      setScrolled]      = useState(false)
   const [scrollProgress,setScrollProgress]= useState(0)
+  const [sectionProgress,setSectionProgress] = useState(0)
   const [mode,          setMode]          = useState("home")
   const [activeSection, setActiveSection] = useState(0)
   const [cmdOpen,       setCmdOpen]       = useState(false)
@@ -48,13 +63,16 @@ export default function Page() {
 
   const snapRef  = useRef<HTMLDivElement>(null)
   const flashRef = useRef<HTMLDivElement>(null)
+  const fullFlashRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
+  const activeSectionRef = useRef(0)
 
   // Section refs
   const homeRef     = useRef<HTMLElement>(null)
   const aboutRef    = useRef<HTMLElement>(null)
   const countersRef = useRef<HTMLDivElement>(null)
   const projectsRef = useRef<HTMLElement>(null)
+  const projectsTrackRef = useRef<HTMLDivElement>(null)
   const physicsRef  = useRef<HTMLElement>(null)
   const musicRef    = useRef<HTMLElement>(null)
   const climbingRef = useRef<HTMLElement>(null)
@@ -62,8 +80,12 @@ export default function Page() {
   const nowRef      = useRef<HTMLDivElement>(null)
   const skillsRef   = useRef<HTMLDivElement>(null)
   const blogRef     = useRef<HTMLDivElement>(null)
+  const collabRef   = useRef<HTMLDivElement>(null)
   const quotesRef   = useRef<HTMLDivElement>(null)
   const contactRef  = useRef<HTMLElement>(null)
+
+  // Keep activeSection ref in sync for wheel handler closure
+  useEffect(() => { activeSectionRef.current = activeSection }, [activeSection])
 
   // ─── SCROLL TO SECTION ────────────────────────────────────────────
   const scrollToSection = useCallback((section: string) => {
@@ -79,6 +101,7 @@ export default function Page() {
       now:      nowRef,
       skills:   skillsRef,
       blog:     blogRef,
+      collab:   collabRef,
       quotes:   quotesRef,
       contact:  contactRef,
     } as Record<string, React.RefObject<HTMLElement | null>>
@@ -102,6 +125,19 @@ export default function Page() {
     const onScroll = () => {
       const max = container.scrollHeight - container.clientHeight
       setScrollProgress(max > 0 ? container.scrollTop / max : 0)
+
+      // Per-section progress for dots
+      const sectionEls = container.querySelectorAll<HTMLElement>(".snap-section")
+      const activeEl = sectionEls[activeSectionRef.current]
+      if (activeEl) {
+        const sectionTop = activeEl.offsetTop
+        const sectionH = activeEl.offsetHeight
+        const scrollTop = container.scrollTop
+        const within = scrollTop - sectionTop
+        const range = Math.max(1, sectionH - container.clientHeight)
+        const prog = Math.max(0, Math.min(100, (within / range) * 100))
+        setSectionProgress(prog)
+      }
     }
     container.addEventListener("scroll", onScroll, { passive: true })
     return () => container.removeEventListener("scroll", onScroll)
@@ -157,18 +193,31 @@ export default function Page() {
     const container = snapRef.current
     const sectionEls = document.querySelectorAll<HTMLElement>("section[data-mode]")
     const flash = flashRef.current
+    const fullFlash = fullFlashRef.current
 
     const obs = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("in-view")
+            const m = (entry.target as HTMLElement).dataset.mode ?? "home"
+
+            // 1px bar flash (existing)
             if (flash) {
-              const m = (entry.target as HTMLElement).dataset.mode ?? "home"
               flash.style.background = FLASH_COLOR[m] ?? FLASH_COLOR.home
               flash.classList.remove("section-flash--active")
               void flash.offsetWidth
               flash.classList.add("section-flash--active")
+            }
+
+            // Full-screen cinematic flash (new)
+            if (fullFlash) {
+              const cls = FLASH_CLASS[m] ?? "flash-blue"
+              fullFlash.className = ""
+              void fullFlash.offsetWidth
+              fullFlash.id = "section-flash-full"
+              fullFlash.classList.add(cls)
+              setTimeout(() => fullFlash.classList.remove(cls), 400)
             }
           }
         })
@@ -179,35 +228,19 @@ export default function Page() {
     return () => obs.disconnect()
   }, [])
 
-
-  // ─── CURSOR TRAIL ─────────────────────────────────────────────────
+  // ─── PROJECTS HORIZONTAL WHEEL HIJACK ────────────────────────────
   useEffect(() => {
-    const trail = Array.from({ length: 10 }, () => ({ x: 0, y: 0, alpha: 0 }))
-    const dots  = Array.from({ length: 10 }, (_, i) =>
-      document.getElementById(`trail-${i}`) as HTMLDivElement | null
-    )
-    let animId: number
-
-    const onMove = (e: MouseEvent) => {
-      for (let i = trail.length - 1; i > 0; i--) trail[i] = { ...trail[i - 1] }
-      trail[0] = { x: e.clientX, y: e.clientY, alpha: 1 }
+    const section = projectsRef.current
+    const track = projectsTrackRef.current
+    if (!section || !track) return
+    const projectsIdx = SECTIONS.findIndex(s => s.key === "projects")
+    const onWheel = (e: WheelEvent) => {
+      if (activeSectionRef.current !== projectsIdx) return
+      e.preventDefault()
+      track.scrollLeft += e.deltaY * 1.2
     }
-    window.addEventListener("mousemove", onMove)
-
-    const loop = () => {
-      trail.forEach((p, i) => {
-        p.alpha = Math.max(0, p.alpha - 0.08)
-        const d = dots[i]
-        if (!d) return
-        d.style.left    = p.x + "px"
-        d.style.top     = p.y + "px"
-        d.style.opacity = String(p.alpha)
-      })
-      animId = requestAnimationFrame(loop)
-    }
-    loop()
-
-    return () => { cancelAnimationFrame(animId); window.removeEventListener("mousemove", onMove) }
+    section.addEventListener("wheel", onWheel, { passive: false })
+    return () => section.removeEventListener("wheel", onWheel)
   }, [])
 
   // ─── COMMAND PALETTE (⌘K / Ctrl+K) ───────────────────────────────
@@ -224,7 +257,7 @@ export default function Page() {
 
   // ─── KEYBOARD NAVIGATION ─────────────────────────────────────────
   useEffect(() => {
-    const KEYS = ["home","about","counters","projects","physics","music","climbing","timeline","now","skills","blog","quotes","contact"]
+    const KEYS = ["home","about","counters","projects","physics","music","climbing","timeline","now","skills","blog","collab","quotes","contact"]
     let gPressed = false
     let gTimer: ReturnType<typeof setTimeout> | null = null
     let kbShownRef = false
@@ -237,7 +270,6 @@ export default function Page() {
     }
 
     const onKey = (e: KeyboardEvent) => {
-      // skip if in input/textarea, or if command palette is open, or modifier held
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
       if (cmdOpen) return
 
@@ -282,8 +314,11 @@ export default function Page() {
       {/* Scroll progress bar */}
       <div className="scroll-progress" style={{ width: `${scrollProgress * 100}%` }} />
 
-      {/* Section flash */}
+      {/* Section flash — 1px bar */}
       <div ref={flashRef} className="section-flash" />
+
+      {/* Cinematic full-screen flash */}
+      <div ref={fullFlashRef} id="section-flash-full" />
 
       {/* Loading screen */}
       {!loaded && <LoadingScreen onComplete={() => setLoaded(true)} />}
@@ -291,13 +326,8 @@ export default function Page() {
       {/* Easter egg */}
       <EasterEgg />
 
-      {/* Solar cell grid cursor */}
-      <SolarCellCursor />
-
-      {/* Cursor trail */}
-      {Array.from({ length: 10 }, (_, i) => (
-        <div key={i} id={`trail-${i}`} className="cursor-trail-dot" />
-      ))}
+      {/* Cursor system */}
+      <CursorSystem />
 
       {/* Background canvas */}
       <BackgroundCanvas mode={mode} />
@@ -305,7 +335,7 @@ export default function Page() {
       {/* Navbar */}
       <Navbar setMode={setMode} mode={mode} scrollToSection={scrollToSection} />
 
-      {/* ⌘K hint in navbar — rendered as fixed overlay near navbar */}
+      {/* ⌘K hint */}
       <button
         className="navbar-cmd-hint"
         style={{ position: "fixed", top: 14, right: 24, zIndex: 101 }}
@@ -326,6 +356,12 @@ export default function Page() {
       {/* Context menu */}
       <ContextMenu scrollToSection={scrollToSection} />
 
+      {/* Weather widget */}
+      <WeatherWidget />
+
+      {/* Share button */}
+      <ShareButton />
+
       {/* Section indicator dots */}
       <div className="section-dots">
         {SECTIONS.map((s, i) => (
@@ -335,6 +371,9 @@ export default function Page() {
             onClick={() => scrollToSection(s.key)}
             aria-label={`Go to ${s.label}`}
             title={s.label}
+            style={activeSection === i ? {
+              ["--dot-progress" as string]: `${sectionProgress}%`,
+            } : {}}
           />
         ))}
       </div>
@@ -382,29 +421,16 @@ export default function Page() {
             </div>
           </section>
 
-          {/* ── ABOUT ───────────────────────────────────────────── */}
-          <section ref={aboutRef} className="about-section fade-section snap-section" data-mode="about">
-            <div className="about-grid">
-              <div className="about-photo-wrapper">
-                <img src="/profile.jpg" alt="Anirudh Menon" className="about-photo" />
-                <div className="about-photo-glow" />
+          {/* ── ABOUT (split screen) ─────────────────────────────── */}
+          <section ref={aboutRef} className="about-section fade-section snap-section" data-mode="about" style={{ padding: 0, position: "relative" }}>
+            <span className="section-ghost-number">01</span>
+            <div className="about-split">
+              {/* Left: image */}
+              <div className="about-split-image">
+                <img src="/profile.jpg" alt="Anirudh Menon" />
               </div>
-              <div className="about-left">
-                {[
-                  { label: "Institution", value: "University of Toledo" },
-                  { label: "Major",       value: "Physics — Astrophysics Track" },
-                  { label: "Minor",       value: "Data Science" },
-                  { label: "Research Lab", value: "Wright Center for Photovoltaics (PVIC)" },
-                  { label: "Leadership",  value: "President, Wilderness Exploration Club" },
-                ].map((s) => (
-                  <div className="about-stat" key={s.label}>
-                    <div className="about-stat-label">{s.label}</div>
-                    <div className="about-stat-value">{s.value}</div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="about-right">
+              {/* Right: content */}
+              <div className="about-split-content">
                 <div className="section-eyebrow">About</div>
                 <ScrambleText text={"Physicist.\nResearcher.\nBuilder."} className="section-title" />
                 <p className="about-lead">
@@ -430,22 +456,39 @@ export default function Page() {
                     <span className="tag" key={t}>{t}</span>
                   ))}
                 </div>
+                {/* Stats */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
+                  {[
+                    { label: "Institution",   value: "University of Toledo" },
+                    { label: "Major",         value: "Physics — Astrophysics Track" },
+                    { label: "Minor",         value: "Data Science" },
+                    { label: "Research Lab",  value: "Wright Center for Photovoltaics (PVIC)" },
+                    { label: "Leadership",    value: "President, Wilderness Exploration Club" },
+                  ].map((s) => (
+                    <div className="about-stat" key={s.label}>
+                      <div className="about-stat-label">{s.label}</div>
+                      <div className="about-stat-value">{s.value}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </section>
 
           {/* ── COUNTERS ────────────────────────────────────────── */}
-          <div ref={countersRef}>
+          <div ref={countersRef} className="snap-section">
             <CounterSection />
           </div>
 
-          {/* ── PROJECTS ────────────────────────────────────────── */}
-          <section ref={projectsRef} className="projects-section fade-section snap-section" data-mode="projects">
-            <div className="projects-header">
+          {/* ── PROJECTS (horizontal scroll) ─────────────────────── */}
+          <section ref={projectsRef} className="projects-horizontal fade-section snap-section" data-mode="projects" style={{ position: "relative" }}>
+            <span className="section-ghost-number">02</span>
+            <div className="projects-horizontal-header">
               <div className="section-eyebrow">Projects</div>
               <ScrambleText text="Selected Work" className="section-title" />
             </div>
-            <div className="projects-grid">
+            <div className="projects-scroll-hint">SCROLL TO EXPLORE</div>
+            <div className="projects-scroll-track" ref={projectsTrackRef}>
               {[
                 {
                   idx: "01", title: "CdTe Solar Cell Interface Optimization",
@@ -472,7 +515,7 @@ export default function Page() {
                   impact: "Hands-on experience in advanced solar cell research and performance optimization",
                 },
               ].map((p) => (
-                <TiltCard key={p.idx} className="project-card">
+                <div key={p.idx} className="project-card-h">
                   <span className="project-index">{p.idx}</span>
                   <h3 className="project-title">{p.title}</h3>
                   <p className="project-desc">{p.desc}</p>
@@ -480,13 +523,14 @@ export default function Page() {
                     <span className="project-role">{p.role}</span>
                     <span className="project-impact">{p.impact}</span>
                   </div>
-                </TiltCard>
+                </div>
               ))}
             </div>
           </section>
 
           {/* ── PHYSICS ─────────────────────────────────────────── */}
-          <section ref={physicsRef} className="fade-section snap-section" data-mode="physics" style={{ paddingTop: "100px", paddingBottom: "80px" }}>
+          <section ref={physicsRef} className="fade-section snap-section" data-mode="physics" style={{ paddingTop: "100px", paddingBottom: "80px", position: "relative" }}>
+            <span className="section-ghost-number">03</span>
             <div className="placeholder-section mode-physics">
               <div className="section-eyebrow">Physics / Space</div>
               <ScrambleText text={"The Universe,\nEngineered."} className="section-title" />
@@ -513,7 +557,8 @@ export default function Page() {
           </section>
 
           {/* ── MUSIC ───────────────────────────────────────────── */}
-          <section ref={musicRef} className="fade-section snap-section" data-mode="music" style={{ paddingTop: "100px", paddingBottom: "80px" }}>
+          <section ref={musicRef} className="fade-section snap-section" data-mode="music" style={{ paddingTop: "100px", paddingBottom: "80px", position: "relative" }}>
+            <span className="section-ghost-number">04</span>
             <div className="placeholder-section mode-music">
               <div className="section-eyebrow">Music / DJ</div>
               <ScrambleText text={"Sound as\na System."} className="section-title" />
@@ -543,7 +588,8 @@ export default function Page() {
           </section>
 
           {/* ── CLIMBING ────────────────────────────────────────── */}
-          <section ref={climbingRef} className="fade-section snap-section" data-mode="climbing" style={{ paddingTop: "100px", paddingBottom: "80px" }}>
+          <section ref={climbingRef} className="fade-section snap-section" data-mode="climbing" style={{ paddingTop: "100px", paddingBottom: "80px", position: "relative" }}>
+            <span className="section-ghost-number">05</span>
             <div className="placeholder-section mode-climbing">
               <div className="section-eyebrow">Climbing / Outdoors</div>
               <ScrambleText text={"Problems on\nRock."} className="section-title" />
@@ -564,17 +610,20 @@ export default function Page() {
           </section>
 
           {/* ── TIMELINE ────────────────────────────────────────── */}
-          <div className="snap-section" ref={timelineRef}>
+          <div className="snap-section" ref={timelineRef} style={{ position: "relative" }}>
+            <span className="section-ghost-number">06</span>
             <Timeline />
           </div>
 
           {/* ── NOW ─────────────────────────────────────────────── */}
-          <div className="snap-section" ref={nowRef}>
+          <div className="snap-section" ref={nowRef} style={{ position: "relative" }}>
+            <span className="section-ghost-number">07</span>
             <NowSection />
           </div>
 
           {/* ── SKILLS ──────────────────────────────────────────── */}
-          <div className="snap-section" ref={skillsRef}>
+          <div className="snap-section" ref={skillsRef} style={{ position: "relative" }}>
+            <span className="section-ghost-number">08</span>
             <SkillsSection />
           </div>
 
@@ -583,13 +632,20 @@ export default function Page() {
             <BlogSection />
           </div>
 
+          {/* ── COLLAB ──────────────────────────────────────────── */}
+          <div ref={collabRef as React.RefObject<HTMLDivElement>} className="snap-section">
+            <CollabSection />
+          </div>
+
           {/* ── QUOTES ──────────────────────────────────────────── */}
-          <div ref={quotesRef}>
+          <div ref={quotesRef} className="snap-section" style={{ position: "relative" }}>
+            <span className="section-ghost-number">10</span>
             <QuotesSection />
           </div>
 
           {/* ── CONTACT ─────────────────────────────────────────── */}
-          <section ref={contactRef} className="contact-section fade-section snap-section" data-mode="contact">
+          <section ref={contactRef} className="contact-section fade-section snap-section" data-mode="contact" style={{ position: "relative" }}>
+            <span className="section-ghost-number">11</span>
             <div className="section-eyebrow">Contact</div>
             <ScrambleText text="Let's Connect" className="section-title" as="h2" />
             <p className="contact-sub">
@@ -645,12 +701,17 @@ export default function Page() {
               <a href="/resume.pdf" download className="resume-btn">Download Resume</a>
             </div>
 
+            {/* Classified hint — subtle */}
+            <a href="/classified" className="classified-hint">
+              Access Level: Restricted — /classified
+            </a>
+
             <footer className="site-footer">
               <span className="site-footer-copy">© 2026 Anirudh Menon · THE ANIRUDH PROTOCOL</span>
               <div className="site-footer-links">
-                <a href="https://github.com/Anixxxrudh"   target="_blank" rel="noreferrer">GitHub</a>
-                <a href="https://www.linkedin.com/in/anirudh-menon-kunnath-pathayapura-247b07246/" target="_blank" rel="noreferrer">LinkedIn</a>
-                <a href="https://instagram.com/anixxrudh" target="_blank" rel="noreferrer">@anixxrudh</a>
+                <a href="https://github.com/Anixxxrudh"   target="_blank" rel="noreferrer" className="footer-link">GitHub</a>
+                <a href="https://www.linkedin.com/in/anirudh-menon-kunnath-pathayapura-247b07246/" target="_blank" rel="noreferrer" className="footer-link">LinkedIn</a>
+                <a href="https://instagram.com/anixxrudh" target="_blank" rel="noreferrer" className="footer-link">@anixxrudh</a>
               </div>
             </footer>
           </section>

@@ -28,7 +28,7 @@ export default function Navbar({ mode, setMode, scrollToSection }: NavbarProps) 
 
   return (
     <>
-      <nav className="navbar">
+      <nav className="navbar" data-mode={mode}>
         <span className="navbar-brand" onClick={() => go("home")}>
           THE ANIRUDH PROTOCOL
         </span>
