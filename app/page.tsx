@@ -17,8 +17,9 @@ import ScrambleText    from "../components/ScrambleText"
 import TiltCard        from "../components/TiltCard"
 import CounterSection  from "../components/CounterSection"
 import QuotesSection   from "../components/QuotesSection"
-import CommandPalette  from "../components/CommandPalette"
-import ContextMenu     from "../components/ContextMenu"
+import CommandPalette    from "../components/CommandPalette"
+import ContextMenu       from "../components/ContextMenu"
+import SolarCellCursor   from "../components/SolarCellCursor"
 
 const SECTIONS = [
   { key: "home",     label: "HOME",     mode: "home"     },
@@ -178,64 +179,6 @@ export default function Page() {
     return () => obs.disconnect()
   }, [])
 
-  // ─── ATOM CURSOR ─────────────────────────────────────────────────
-  useEffect(() => {
-    const nucleus  = document.getElementById("cursor-nucleus")
-    const orbit    = document.getElementById("cursor-orbit")
-    const electron = document.getElementById("cursor-electron")
-    if (!nucleus || !orbit || !electron) return
-
-    let orbitX = 0, orbitY = 0, curX = 0, curY = 0
-    let angle = 0, animId = 0
-    let isHovered = false
-
-    const onMove = (e: MouseEvent) => {
-      curX = e.clientX; curY = e.clientY
-      nucleus.style.left = curX + "px"
-      nucleus.style.top  = curY + "px"
-    }
-    const onEnter = () => { isHovered = true }
-    const onLeave = () => { isHovered = false }
-
-    const interactables = document.querySelectorAll(
-      "button, a, .project-card, .contact-link, .resume-btn, .navbar-brand"
-    )
-    interactables.forEach((el) => {
-      el.addEventListener("mouseenter", onEnter)
-      el.addEventListener("mouseleave", onLeave)
-    })
-
-    const loop = () => {
-      orbitX += (curX - orbitX) * 0.1
-      orbitY += (curY - orbitY) * 0.1
-      angle += isHovered ? 0.08 : 0.04
-      const radius = isHovered ? 20 : 14
-      const eX = orbitX + Math.cos(angle) * radius
-      const eY = orbitY + Math.sin(angle) * (radius * 0.45)
-
-      orbit.style.left   = orbitX + "px"
-      orbit.style.top    = orbitY + "px"
-      orbit.style.width  = `${radius * 2}px`
-      orbit.style.height = `${radius * 0.9}px`
-      orbit.style.borderColor = isHovered ? "rgba(77,184,255,0.8)" : "rgba(77,184,255,0.45)"
-      electron.style.left = eX + "px"
-      electron.style.top  = eY + "px"
-      electron.style.boxShadow = isHovered ? "0 0 8px rgba(77,184,255,1)" : "0 0 5px rgba(77,184,255,0.8)"
-
-      animId = requestAnimationFrame(loop)
-    }
-    window.addEventListener("mousemove", onMove)
-    loop()
-
-    return () => {
-      cancelAnimationFrame(animId)
-      window.removeEventListener("mousemove", onMove)
-      interactables.forEach((el) => {
-        el.removeEventListener("mouseenter", onEnter)
-        el.removeEventListener("mouseleave", onLeave)
-      })
-    }
-  }, [])
 
   // ─── CURSOR TRAIL ─────────────────────────────────────────────────
   useEffect(() => {
@@ -348,10 +291,8 @@ export default function Page() {
       {/* Easter egg */}
       <EasterEgg />
 
-      {/* Atom cursor */}
-      <div id="cursor-nucleus" />
-      <div id="cursor-orbit"   />
-      <div id="cursor-electron" />
+      {/* Solar cell grid cursor */}
+      <SolarCellCursor />
 
       {/* Cursor trail */}
       {Array.from({ length: 10 }, (_, i) => (

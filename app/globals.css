@@ -36,39 +36,7 @@ canvas {
   pointer-events: none;
 }
 
-/* ─── ATOM CURSOR ───────────────────────────────────────────────────── */
-#cursor-nucleus,
-#cursor-orbit,
-#cursor-electron {
-  position: fixed;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-}
-
-#cursor-nucleus {
-  width: 5px;
-  height: 5px;
-  background: #fff;
-  border-radius: 50%;
-  box-shadow: 0 0 8px rgba(77,184,255,0.9);
-}
-
-#cursor-orbit {
-  border: 1px solid rgba(77,184,255,0.45);
-  border-radius: 50%;
-  width: 28px;
-  height: 13px;
-  transition: border-color 0.2s ease, width 0.2s ease, height 0.2s ease;
-}
-
-#cursor-electron {
-  width: 4px;
-  height: 4px;
-  background: var(--c-blue);
-  border-radius: 50%;
-  box-shadow: 0 0 5px rgba(77,184,255,0.9);
-}
+/* Solar cell cursor handled by SolarCellCursor.tsx canvas component */
 
 .navbar-brand {
   font-family: var(--font-display);
@@ -254,7 +222,7 @@ section {
 
 .about-grid {
   display: grid;
-  grid-template-columns: 280px 1fr 1.6fr;
+  grid-template-columns: 400px 1fr 1.6fr;
   gap: 48px;
   max-width: 1160px;
   width: 100%;
@@ -750,7 +718,7 @@ section {
   .navbar { gap: 6px; padding: 10px 12px; }
   .navbar-desktop-btn { font-size: 0.52rem; padding: 6px 10px; letter-spacing: 0.1em; }
   .crawl-wrapper { display: none; }
-  #cursor-nucleus, #cursor-orbit, #cursor-electron { display: none; }
+  /* solar cell cursor canvas hidden on touch */ canvas#solar-cursor { display: none; }
   body { cursor: auto; }
 }
 
@@ -1476,38 +1444,42 @@ section {
 /* ─── ABOUT PHOTO ───────────────────────────────────────────────────── */
 .about-photo-wrapper {
   position: relative;
-  width: 280px;
-  height: 280px;
+  width: 400px;
+  height: 500px;
   flex-shrink: 0;
-  align-self: center;
+  align-self: start;
 }
 .about-photo {
-  width: 280px;
-  height: 280px;
+  width: 400px;
+  height: 500px;
   object-fit: cover;
   object-position: center top;
-  border-radius: 8px;
-  border: 1px solid rgba(77,184,255,0.35);
-  filter: grayscale(15%) contrast(1.08);
+  border-radius: 6px;
+  border: 1px solid rgba(77,184,255,0.3);
+  filter: grayscale(10%) contrast(1.06);
   position: relative;
   z-index: 1;
   display: block;
 }
 .about-photo-glow {
   position: absolute;
-  inset: -16px;
-  border-radius: 12px;
-  background: radial-gradient(circle, rgba(77,184,255,0.18) 0%, transparent 70%);
+  inset: -20px;
+  border-radius: 10px;
+  background: radial-gradient(circle at 50% 40%, rgba(77,184,255,0.2) 0%, transparent 65%);
   z-index: 0;
   animation: pulseGlow 3s ease-in-out infinite;
 }
 @keyframes pulseGlow {
-  0%,100% { opacity: 0.6; transform: scale(1); }
-  50%      { opacity: 1;   transform: scale(1.05); }
+  0%,100% { opacity: 0.55; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.04); }
+}
+@media (max-width: 1100px) {
+  .about-photo-wrapper { width: 300px; height: 375px; }
+  .about-photo { width: 300px; height: 375px; }
 }
 @media (max-width: 768px) {
-  .about-photo-wrapper { margin: 0 auto 32px; width: 220px; height: 220px; }
-  .about-photo { width: 220px; height: 220px; }
+  .about-photo-wrapper { margin: 0 auto 32px; width: 260px; height: 325px; }
+  .about-photo { width: 260px; height: 325px; }
 }
 
 /* ─── LAB IMAGE ─────────────────────────────────────────────────────── */
