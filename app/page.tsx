@@ -92,7 +92,7 @@ export default function Page() {
 
   // ─── SCROLL TO ────────────────────────────────────────────────────
   const scrollToSection = (section: string) => {
-    const map: Record<string, React.RefObject<HTMLElement>> = {
+    const map: Record<string, React.RefObject<HTMLElement | null>> = {
       home:     homeRef,
       about:    aboutRef,
       projects: projectsRef,
