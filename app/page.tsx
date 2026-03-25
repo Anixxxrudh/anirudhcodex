@@ -8,7 +8,7 @@ import Timeline from "../components/Timeline"
 import NowSection from "../components/NowSection"
 import SkillsSection from "../components/SkillsSection"
 import EasterEgg from "../components/EasterEgg"
-import ParticleField   from "../components/ParticleField"
+import HeroCanvas      from "../components/HeroCanvas"
 import AtomCanvas      from "../components/AtomCanvas"
 import SolarSystem     from "../components/SolarSystem"
 import BlogSection     from "../components/BlogSection"
@@ -192,6 +192,39 @@ export default function Page() {
     }
   }, [])
 
+  // ─── CURSOR TRAIL ─────────────────────────────────────────────────
+  useEffect(() => {
+    const trail = Array.from({ length: 10 }, () => ({ x: 0, y: 0, alpha: 0 }))
+    const dots  = Array.from({ length: 10 }, (_, i) => document.getElementById(`trail-${i}`) as HTMLDivElement | null)
+    let animId: number
+
+    const onMove = (e: MouseEvent) => {
+      for (let i = trail.length - 1; i > 0; i--) {
+        trail[i] = { ...trail[i - 1] }
+      }
+      trail[0] = { x: e.clientX, y: e.clientY, alpha: 1 }
+    }
+    window.addEventListener("mousemove", onMove)
+
+    const loop = () => {
+      trail.forEach((p, i) => {
+        p.alpha = Math.max(0, p.alpha - 0.08)
+        const d = dots[i]
+        if (!d) return
+        d.style.left    = p.x + "px"
+        d.style.top     = p.y + "px"
+        d.style.opacity = String(p.alpha)
+      })
+      animId = requestAnimationFrame(loop)
+    }
+    loop()
+
+    return () => {
+      cancelAnimationFrame(animId)
+      window.removeEventListener("mousemove", onMove)
+    }
+  }, [])
+
   // ─── SCROLL TO ────────────────────────────────────────────────────
   const scrollToSection = (section: string) => {
     const map = {
@@ -225,6 +258,11 @@ export default function Page() {
       <div id="cursor-orbit"   />
       <div id="cursor-electron" />
 
+      {/* Cursor trail */}
+      {Array.from({ length: 10 }, (_, i) => (
+        <div key={i} id={`trail-${i}`} className="cursor-trail-dot" />
+      ))}
+
       {/* Background */}
       <BackgroundCanvas mode={mode} />
 
@@ -234,36 +272,42 @@ export default function Page() {
       <main>
 
         {/* ── HOME ──────────────────────────────────────────────────── */}
-        <section ref={homeRef} className="home-section" data-mode="home">
-          <ParticleField />
-          <h1 ref={titleRef} className="home-name" data-text="THE ANIRUDH PROTOCOL">THE ANIRUDH PROTOCOL</h1>
-          <p className="home-tagline">
-            Astrophysics&nbsp;&nbsp;·&nbsp;&nbsp;Photovoltaics&nbsp;&nbsp;·&nbsp;&nbsp;Climbing&nbsp;&nbsp;·&nbsp;&nbsp;Music
-          </p>
+        <section ref={homeRef} className="home-section" data-mode="home" style={{ position: "relative" }}>
+          <HeroCanvas />
+          <div className="home-content">
+            <h1 ref={titleRef} className="home-name" data-text="THE ANIRUDH PROTOCOL">THE ANIRUDH PROTOCOL</h1>
+            <p className="home-tagline">
+              Astrophysics&nbsp;&nbsp;·&nbsp;&nbsp;Photovoltaics&nbsp;&nbsp;·&nbsp;&nbsp;Climbing&nbsp;&nbsp;·&nbsp;&nbsp;Music
+            </p>
 
-          {/* Star Wars crawl */}
-          <div className="crawl-wrapper">
-            <div className={`crawl-inner${loaded ? "" : " crawl-paused"}`}>
-              <p>
-                From solar cells to distant galaxies,
-                from sound waves to mountain walls —
-              </p>
-              <p>
-                this is where science, creativity,
-                and motion converge.
-              </p>
-              <p>
-                This is The Anirudh Protocol.
-              </p>
+            {/* Star Wars crawl */}
+            <div className="crawl-wrapper">
+              <div className={`crawl-inner${loaded ? "" : " crawl-paused"}`}>
+                <p>
+                  From solar cells to distant galaxies,
+                  from sound waves to mountain walls —
+                </p>
+                <p>
+                  this is where science, creativity,
+                  and motion converge.
+                </p>
+                <p>
+                  This is The Anirudh Protocol.
+                </p>
+              </div>
             </div>
-          </div>
 
-          <span className="home-scroll-hint" style={{ opacity: scrolled ? 0 : undefined }}>scroll to explore</span>
+            <span className="home-scroll-hint" style={{ opacity: scrolled ? 0 : undefined }}>scroll to explore</span>
+          </div>
         </section>
 
         {/* ── ABOUT ─────────────────────────────────────────────────── */}
         <section ref={aboutRef} className="about-section fade-section" data-mode="about">
           <div className="about-grid">
+            <div className="about-photo-wrapper">
+              <img src="/profile.jpg" alt="Anirudh Menon" className="about-photo" />
+              <div className="about-photo-glow" />
+            </div>
             <div className="about-left">
               <div className="about-stat">
                 <div className="about-stat-label">Institution</div>
@@ -388,6 +432,10 @@ export default function Page() {
           <div className="placeholder-section mode-physics">
             <div className="section-eyebrow">Physics / Space</div>
             <h2 className="section-title">The Universe,<br />Engineered.</h2>
+            <div className="lab-image-wrapper">
+              <img src="/lab.jpg" alt="PVIC Research Lab" className="lab-image" />
+              <div className="lab-image-caption">Wright Center for Photovoltaics Innovation — PVIC Lab</div>
+            </div>
             <div className="placeholder-grid">
               {[
                 { label: "Research Focus", title: "Solar Photovoltaics", body: "At PVIC, I work on improving the efficiency of CdTe/CdSeTe thin-film solar cells through back-interface engineering. The work involves fabricating devices, running JV and EQE characterization, and analyzing how carbon nanotube networks and ALD-deposited aluminum oxide affect carrier recombination. Physics applied to a problem that matters." },
@@ -423,6 +471,15 @@ export default function Page() {
                   <p className="placeholder-card-body">{c.body}</p>
                 </div>
               ))}
+            </div>
+            <div className="music-embed-wrapper">
+              <iframe
+                allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
+                height="450"
+                style={{ width: "100%", maxWidth: "660px", overflow: "hidden", borderRadius: "10px", border: 0 }}
+                sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
+                src="https://embed.music.apple.com/us/playlist/my-axiom/pl.u-8aAVoV6HvRXxB1z"
+              />
             </div>
           </div>
         </section>

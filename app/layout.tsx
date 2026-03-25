@@ -44,7 +44,10 @@ export default function RootLayout({
       lang="en"
       className={`${orbitron.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <div aria-hidden="true" className="noise-overlay" />
+        {children}
+      </body>
     </html>
   );
 }

@@ -32,6 +32,7 @@ export default function SkillsSection() {
       <div className="skills-list">
         {SKILLS.map((s) => (
           <div className="skill-row" key={s.label}>
+            <span className="skill-ghost-number">{s.level}</span>
             <div className="skill-meta">
               <span className="skill-label">{s.label}</span>
               <span className="skill-level">{s.tag}</span>
