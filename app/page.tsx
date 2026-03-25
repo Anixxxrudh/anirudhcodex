@@ -7,13 +7,13 @@ import Navbar from "../components/Navbar"
 export default function Page() {
   const [mode, setMode] = useState("home")
 
-  const homeRef     = useRef(null)
-  const aboutRef    = useRef(null)
-  const projectsRef = useRef(null)
-  const physicsRef  = useRef(null)
-  const musicRef    = useRef(null)
-  const climbingRef = useRef(null)
-  const contactRef  = useRef(null)
+  const homeRef     = useRef<HTMLElement>(null)
+  const aboutRef    = useRef<HTMLElement>(null)
+  const projectsRef = useRef<HTMLElement>(null)
+  const physicsRef  = useRef<HTMLElement>(null)
+  const musicRef    = useRef<HTMLElement>(null)
+  const climbingRef = useRef<HTMLElement>(null)
+  const contactRef  = useRef<HTMLElement>(null)
 
   // ─── SCROLL → MODE DETECTION ──────────────────────────────────────
   useEffect(() => {
@@ -51,7 +51,7 @@ export default function Page() {
 
     let ringX = 0, ringY = 0
     let curX  = 0, curY  = 0
-    let animId: number
+    let animId: number = 0
 
     const onMove = (e: MouseEvent) => {
       curX = e.clientX
