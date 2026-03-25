@@ -183,7 +183,7 @@ section {
 
 .home-name {
   font-family: var(--font-display);
-  font-size: clamp(2.4rem, 8vw, 7rem);
+  font-size: clamp(1.6rem, 5.5vw, 5.5rem);
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -192,6 +192,7 @@ section {
     0 0 30px rgba(77, 184, 255, 0.6),
     0 0 80px rgba(77, 184, 255, 0.2);
   animation: fadeUp 1.2s ease both;
+  text-align: center;
 }
 
 .home-tagline {
