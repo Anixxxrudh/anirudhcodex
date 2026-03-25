@@ -19,6 +19,10 @@ const NAV_ITEMS = [
 export default function Navbar({ mode, setMode, scrollToSection }: NavbarProps) {
   return (
     <nav className="navbar">
+      <span className="navbar-brand" onClick={() => { setMode("home"); scrollToSection("home") }}>
+        THE PROTOCOL
+      </span>
+      <div className="navbar-divider" />
       {NAV_ITEMS.map(({ key, label }) => (
         <button
           key={key}

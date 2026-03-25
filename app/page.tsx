@@ -92,7 +92,7 @@ export default function Page() {
 
   // ─── SCROLL TO ────────────────────────────────────────────────────
   const scrollToSection = (section: string) => {
-    const map: Record<string, React.RefObject<HTMLElement | null>> = {
+    const map = {
       home:     homeRef,
       about:    aboutRef,
       projects: projectsRef,
@@ -100,7 +100,7 @@ export default function Page() {
       music:    musicRef,
       climbing: climbingRef,
       contact:  contactRef,
-    }
+    } as Record<string, React.RefObject<HTMLElement | null>>
     map[section]?.current?.scrollIntoView({ behavior: "smooth" })
   }
 
@@ -120,7 +120,7 @@ export default function Page() {
 
         {/* ── HOME ──────────────────────────────────────────────────── */}
         <section ref={homeRef} className="home-section">
-          <h1 className="home-name">ANIRUDH MENON</h1>
+          <h1 className="home-name">ANIRUDH CODEX</h1>
           <p className="home-tagline">
             Astrophysics&nbsp;&nbsp;·&nbsp;&nbsp;Photovoltaics&nbsp;&nbsp;·&nbsp;&nbsp;Climbing&nbsp;&nbsp;·&nbsp;&nbsp;Music
           </p>
@@ -137,7 +137,7 @@ export default function Page() {
                 and motion converge.
               </p>
               <p>
-                This is the Anirudh Codex.
+                This is the Anirudh Protocol.
               </p>
             </div>
           </div>
@@ -251,13 +251,18 @@ export default function Page() {
               </div>
             </div>
 
-            <div className="project-card project-card--dim">
+            <div className="project-card">
               <span className="project-index">04</span>
-              <h3 className="project-title">Coming Soon</h3>
+              <h3 className="project-title">Photovoltaics Research Portfolio</h3>
               <p className="project-desc">
-                A new project is in progress. Reach out if you want to collaborate
-                on something at the edge of physics, data, and design.
+                A deeper look into my work at the Wright Center for Photovoltaics,
+                including device fabrication, JV and EQE characterization, and interface
+                engineering techniques using carbon nanotubes and ALD-deposited aluminum oxide.
               </p>
+              <div className="project-footer">
+                <span className="project-role">Researcher — PVIC, University of Toledo</span>
+                <span className="project-impact">Hands-on experience in advanced solar cell research and performance optimization</span>
+              </div>
             </div>
           </div>
         </section>
@@ -271,7 +276,7 @@ export default function Page() {
               {[
                 { label: "Research Focus", title: "Solar Photovoltaics", body: "At PVIC, I work on improving the efficiency of CdTe/CdSeTe thin-film solar cells through back-interface engineering. The work involves fabricating devices, running JV and EQE characterization, and analyzing how carbon nanotube networks and ALD-deposited aluminum oxide affect carrier recombination. Physics applied to a problem that matters." },
                 { label: "Interest Area",  title: "Cosmology & the Early Universe", body: "The questions that pull me most are the large-scale ones — what triggered the Big Bang, what dark matter actually is, and how dark energy is driving the accelerating expansion of the universe. These are not just abstract puzzles. They define the structure of everything that exists." },
-                { label: "Coming Soon",    title: "Research Notes & Publications", body: "Findings, data summaries, and writeups from ongoing PVIC research will be published here as the work progresses." },
+                { label: "Lab Visuals — Coming Soon", title: "Research Images & Data", body: "Lab photographs, device characterization plots, and JV/EQE data visualizations from PVIC research will be displayed here." },
               ].map((c) => (
                 <div className="placeholder-card" key={c.title}>
                   <span className="placeholder-card-label">{c.label}</span>
@@ -292,7 +297,7 @@ export default function Page() {
               {[
                 { label: "Genre", title: "House, Techno, Ambient", body: "I mix electronic music that leans atmospheric — deep house, minimal techno, and ambient textures that build space rather than just energy. The goal is always immersion over impact." },
                 { label: "Practice", title: "Set Building", body: "DJing is how I think about flow and structure outside the lab. A good set moves like a narrative — tension, release, texture, resolution. I build sets that feel like a journey from start to finish, not just a playlist." },
-                { label: "Coming Soon", title: "Recorded Sets", body: "Mixes and recorded sets will be available here. If you want to hear something in the meantime, reach out." },
+                { label: "Mixes — Coming Soon", title: "SoundCloud / Stream", body: "Recorded sets and mixes will be embedded here via SoundCloud. Reach out directly if you want to hear something sooner." },
               ].map((c) => (
                 <div className="placeholder-card" key={c.title}>
                   <span className="placeholder-card-label">{c.label}</span>
@@ -313,7 +318,7 @@ export default function Page() {
               {[
                 { label: "Discipline", title: "Intermediate Climbing", body: "Mostly indoor right now, working toward more outdoor routes. Climbing, for me, is a mental discipline as much as a physical one — reading a problem, committing to a sequence, staying precise under pressure. The same qualities that make a good researcher." },
                 { label: "Leadership", title: "Wilderness Exploration Club", body: "As President, I plan and execute day hikes, climbing sessions, and multi-day wilderness trips for the club. Logistics, safety, and keeping people moving — it is a different kind of systems problem, but a real one." },
-                { label: "Coming Soon", title: "Trip Reports & Routes", body: "Photos, trip logs, and notable routes from club expeditions will be documented here." },
+                { label: "Gallery — Coming Soon", title: "Trip Photos & Routes", body: "Photos, trip logs, and route documentation from club expeditions will be added here. Check back after the next trip." },
               ].map((c) => (
                 <div className="placeholder-card" key={c.title}>
                   <span className="placeholder-card-label">{c.label}</span>
@@ -335,13 +340,17 @@ export default function Page() {
           </p>
 
           <div className="contact-links">
-            <a href="mailto:your@email.com" className="contact-link">
-              <span className="contact-link-label">Email</span>
-              <span className="contact-link-value">your@email.com</span>
+            <a href="mailto:akunnat3@rockets.utoledo.edu" className="contact-link">
+              <span className="contact-link-label">University Email</span>
+              <span className="contact-link-value">akunnat3@rockets.utoledo.edu</span>
             </a>
-            <a href="https://linkedin.com/in/yourprofile" target="_blank" rel="noreferrer" className="contact-link">
+            <a href="mailto:anirudhmenon2k10@gmail.com" className="contact-link contact-link--secondary">
+              <span className="contact-link-label">Personal</span>
+              <span className="contact-link-value">anirudhmenon2k10@gmail.com</span>
+            </a>
+            <a href="https://www.linkedin.com/in/anirudh-menon-kunnath-pathayapura-247b07246/" target="_blank" rel="noreferrer" className="contact-link">
               <span className="contact-link-label">LinkedIn</span>
-              <span className="contact-link-value">linkedin.com/in/yourprofile</span>
+              <span className="contact-link-value">Anirudh Menon Kunnath</span>
             </a>
             <a href="https://github.com/Anixxxrudh" target="_blank" rel="noreferrer" className="contact-link">
               <span className="contact-link-label">GitHub</span>

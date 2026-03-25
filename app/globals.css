@@ -65,6 +65,29 @@ canvas {
   box-shadow: 0 0 20px rgba(77, 184, 255, 0.35);
 }
 
+.navbar-brand {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  color: rgba(255,255,255,0.9);
+  text-transform: uppercase;
+  cursor: none;
+  white-space: nowrap;
+  text-shadow: 0 0 20px rgba(77,184,255,0.5);
+  transition: text-shadow 0.3s ease;
+}
+.navbar-brand:hover {
+  text-shadow: 0 0 30px rgba(77,184,255,0.9);
+}
+
+.navbar-divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(255,255,255,0.12);
+  margin: 0 4px;
+}
+
 /* ─── NAVBAR ────────────────────────────────────────────────────────── */
 .navbar {
   position: fixed;
@@ -608,6 +631,11 @@ section {
   font-size: 0.84rem;
   color: rgba(255,255,255,0.62);
 }
+
+.contact-link--secondary {
+  opacity: 0.55;
+}
+.contact-link--secondary:hover { opacity: 1; }
 
 .resume-block {
   margin-top: 60px;
