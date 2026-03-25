@@ -1,4 +1,5 @@
 "use client"
+import { useState } from "react"
 
 type NavbarProps = {
   mode: string
@@ -17,24 +18,60 @@ const NAV_ITEMS = [
 ]
 
 export default function Navbar({ mode, setMode, scrollToSection }: NavbarProps) {
+  const [open, setOpen] = useState(false)
+
+  const go = (key: string) => {
+    setMode(key)
+    scrollToSection(key)
+    setOpen(false)
+  }
+
   return (
-    <nav className="navbar">
-      <span className="navbar-brand" onClick={() => { setMode("home"); scrollToSection("home") }}>
-        THE ANIRUDH PROTOCOL
-      </span>
-      <div className="navbar-divider" />
-      {NAV_ITEMS.map(({ key, label }) => (
+    <>
+      <nav className="navbar">
+        <span className="navbar-brand" onClick={() => go("home")}>
+          THE ANIRUDH PROTOCOL
+        </span>
+        <div className="navbar-divider" />
+
+        {/* Desktop nav items */}
+        {NAV_ITEMS.map(({ key, label }) => (
+          <button
+            key={key}
+            className={`navbar-desktop-btn${mode === key ? " active" : ""}`}
+            onClick={() => go(key)}
+          >
+            {label}
+          </button>
+        ))}
+
+        {/* Mobile hamburger */}
         <button
-          key={key}
-          className={mode === key ? "active" : ""}
-          onClick={() => {
-            setMode(key)
-            scrollToSection(key)
-          }}
+          className={`hamburger${open ? " hamburger--open" : ""}`}
+          onClick={() => setOpen((o) => !o)}
+          aria-label="Toggle menu"
         >
-          {label}
+          <span />
+          <span />
+          <span />
         </button>
-      ))}
-    </nav>
+      </nav>
+
+      {/* Mobile overlay */}
+      <div className={`mobile-overlay${open ? " mobile-overlay--open" : ""}`}>
+        <nav className="mobile-nav">
+          {NAV_ITEMS.map(({ key, label }, i) => (
+            <button
+              key={key}
+              className="mobile-nav-item"
+              style={{ animationDelay: `${i * 60}ms` }}
+              onClick={() => go(key)}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
+      </div>
+    </>
   )
 }

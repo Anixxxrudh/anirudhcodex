@@ -8,13 +8,18 @@ import Timeline from "../components/Timeline"
 import NowSection from "../components/NowSection"
 import SkillsSection from "../components/SkillsSection"
 import EasterEgg from "../components/EasterEgg"
-import ParticleField from "../components/ParticleField"
+import ParticleField   from "../components/ParticleField"
+import AtomCanvas      from "../components/AtomCanvas"
+import SolarSystem     from "../components/SolarSystem"
+import BlogSection     from "../components/BlogSection"
+import ContactForm     from "../components/ContactForm"
 
 export default function Page() {
   const [loaded, setLoaded] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [mode, setMode] = useState("home")
+  const flashRef = useRef<HTMLDivElement>(null)
 
   const titleRef = useRef<HTMLHeadingElement>(null)
 
@@ -51,6 +56,42 @@ export default function Page() {
     }
     window.addEventListener("mousemove", onMove)
     return () => window.removeEventListener("mousemove", onMove)
+  }, [])
+
+  // ─── SECTION FLASH + FADE-IN ─────────────────────────────────────
+  useEffect(() => {
+    const FLASH_COLOR: Record<string, string> = {
+      home:     "rgba(77,184,255,0.7)",
+      about:    "rgba(77,184,255,0.7)",
+      projects: "rgba(77,184,255,0.7)",
+      physics:  "rgba(0,229,255,0.7)",
+      music:    "rgba(255,124,56,0.7)",
+      climbing: "rgba(126,217,87,0.7)",
+      contact:  "rgba(77,184,255,0.7)",
+    }
+
+    const sectionEls = document.querySelectorAll<HTMLElement>("section[data-mode]")
+    const flash = flashRef.current
+
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        // Fade-in
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in-view")
+        }
+        // Flash
+        if (entry.isIntersecting && flash) {
+          const m = (entry.target as HTMLElement).dataset.mode ?? "home"
+          flash.style.background = FLASH_COLOR[m] ?? FLASH_COLOR.home
+          flash.classList.remove("section-flash--active")
+          void flash.offsetWidth               // force reflow to restart animation
+          flash.classList.add("section-flash--active")
+        }
+      })
+    }, { threshold: 0.15 })
+
+    sectionEls.forEach((el) => obs.observe(el))
+    return () => obs.disconnect()
   }, [])
 
   // ─── SCROLL → MODE DETECTION ──────────────────────────────────────
@@ -170,6 +211,9 @@ export default function Page() {
       {/* Scroll progress bar */}
       <div className="scroll-progress" style={{ width: `${scrollProgress * 100}%` }} />
 
+      {/* Section flash */}
+      <div ref={flashRef} className="section-flash" />
+
       {/* Loading screen */}
       {!loaded && <LoadingScreen onComplete={() => setLoaded(true)} />}
 
@@ -190,9 +234,9 @@ export default function Page() {
       <main>
 
         {/* ── HOME ──────────────────────────────────────────────────── */}
-        <section ref={homeRef} className="home-section">
+        <section ref={homeRef} className="home-section" data-mode="home">
           <ParticleField />
-          <h1 ref={titleRef} className="home-name">THE ANIRUDH PROTOCOL</h1>
+          <h1 ref={titleRef} className="home-name" data-text="THE ANIRUDH PROTOCOL">THE ANIRUDH PROTOCOL</h1>
           <p className="home-tagline">
             Astrophysics&nbsp;&nbsp;·&nbsp;&nbsp;Photovoltaics&nbsp;&nbsp;·&nbsp;&nbsp;Climbing&nbsp;&nbsp;·&nbsp;&nbsp;Music
           </p>
@@ -218,7 +262,7 @@ export default function Page() {
         </section>
 
         {/* ── ABOUT ─────────────────────────────────────────────────── */}
-        <section ref={aboutRef} className="about-section">
+        <section ref={aboutRef} className="about-section fade-section" data-mode="about">
           <div className="about-grid">
             <div className="about-left">
               <div className="about-stat">
@@ -274,7 +318,7 @@ export default function Page() {
         </section>
 
         {/* ── PROJECTS ──────────────────────────────────────────────── */}
-        <section ref={projectsRef} className="projects-section">
+        <section ref={projectsRef} className="projects-section fade-section" data-mode="projects">
           <div className="projects-header">
             <div className="section-eyebrow">Projects</div>
             <h2 className="section-title">Selected Work</h2>
@@ -340,7 +384,7 @@ export default function Page() {
         </section>
 
         {/* ── PHYSICS ───────────────────────────────────────────────── */}
-        <section ref={physicsRef} style={{ minHeight: "100vh", paddingTop: "100px", paddingBottom: "80px" }}>
+        <section ref={physicsRef} className="fade-section" data-mode="physics" style={{ minHeight: "100vh", paddingTop: "100px", paddingBottom: "80px" }}>
           <div className="placeholder-section mode-physics">
             <div className="section-eyebrow">Physics / Space</div>
             <h2 className="section-title">The Universe,<br />Engineered.</h2>
@@ -358,10 +402,12 @@ export default function Page() {
               ))}
             </div>
           </div>
+          <AtomCanvas />
+          <SolarSystem />
         </section>
 
         {/* ── MUSIC ─────────────────────────────────────────────────── */}
-        <section ref={musicRef} style={{ minHeight: "100vh", paddingTop: "100px", paddingBottom: "80px" }}>
+        <section ref={musicRef} className="fade-section" data-mode="music" style={{ minHeight: "100vh", paddingTop: "100px", paddingBottom: "80px" }}>
           <div className="placeholder-section mode-music">
             <div className="section-eyebrow">Music / DJ</div>
             <h2 className="section-title">Sound as<br />a System.</h2>
@@ -382,7 +428,7 @@ export default function Page() {
         </section>
 
         {/* ── CLIMBING ──────────────────────────────────────────────── */}
-        <section ref={climbingRef} style={{ minHeight: "100vh", paddingTop: "100px", paddingBottom: "80px" }}>
+        <section ref={climbingRef} className="fade-section" data-mode="climbing" style={{ minHeight: "100vh", paddingTop: "100px", paddingBottom: "80px" }}>
           <div className="placeholder-section mode-climbing">
             <div className="section-eyebrow">Climbing / Outdoors</div>
             <h2 className="section-title">Problems on<br />Rock.</h2>
@@ -411,14 +457,19 @@ export default function Page() {
         {/* ── SKILLS ────────────────────────────────────────────────── */}
         <SkillsSection />
 
+        {/* ── BLOG ──────────────────────────────────────────────────── */}
+        <BlogSection />
+
         {/* ── CONTACT ───────────────────────────────────────────────── */}
-        <section ref={contactRef} className="contact-section">
+        <section ref={contactRef} className="contact-section fade-section" data-mode="contact">
           <div className="section-eyebrow">Contact</div>
           <h2 className="section-title" style={{ textAlign: "center" }}>Let's Connect</h2>
           <p className="contact-sub">
             Open to research collaborations, internships, and conversations
             about physics, renewable energy, and technology.
           </p>
+
+          <ContactForm />
 
           <div className="contact-links">
             <a href="mailto:akunnat3@rockets.utoledo.edu" className="contact-link">
@@ -471,6 +522,15 @@ export default function Page() {
         </section>
 
       </main>
+
+      <footer className="site-footer">
+        <span className="site-footer-copy">© 2026 Anirudh Menon · THE ANIRUDH PROTOCOL</span>
+        <div className="site-footer-links">
+          <a href="https://github.com/Anixxxrudh"   target="_blank" rel="noreferrer">GitHub</a>
+          <a href="https://www.linkedin.com/in/anirudh-menon-kunnath-pathayapura-247b07246/" target="_blank" rel="noreferrer">LinkedIn</a>
+          <a href="https://instagram.com/anixxrudh" target="_blank" rel="noreferrer">@anixxrudh</a>
+        </div>
+      </footer>
     </>
   )
 }
