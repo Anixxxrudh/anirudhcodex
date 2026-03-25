@@ -129,13 +129,12 @@ export default function Page() {
           <div className="crawl-wrapper">
             <div className="crawl-inner">
               <p>
-                A physicist at the frontier of solar energy research,
-                exploring the quantum behaviour of thin-film interfaces.
+                From solar cells to distant galaxies,
+                from sound waves to mountain walls —
               </p>
               <p>
-                From the Wright Center for Photovoltaics Innovation
-                to the peaks of the Wilderness Exploration Club —
-                every challenge is a system waiting to be understood.
+                this is where science, creativity,
+                and motion converge.
               </p>
               <p>
                 This is the Anirudh Codex.
@@ -270,9 +269,9 @@ export default function Page() {
             <h2 className="section-title">The Universe,<br />Engineered.</h2>
             <div className="placeholder-grid">
               {[
-                { label: "Research Focus", title: "Solar Photovoltaics", body: "CdTe/CdSeTe thin-film devices, interface engineering, ALD deposition techniques." },
-                { label: "Interest Area",  title: "Astrophysics",        body: "Stellar dynamics, cosmology, and the physics of extreme environments." },
-                { label: "Coming Soon",    title: "Research Publications",body: "Papers, findings, and lab updates from PVIC research will appear here." },
+                { label: "Research Focus", title: "Solar Photovoltaics", body: "At PVIC, I work on improving the efficiency of CdTe/CdSeTe thin-film solar cells through back-interface engineering. The work involves fabricating devices, running JV and EQE characterization, and analyzing how carbon nanotube networks and ALD-deposited aluminum oxide affect carrier recombination. Physics applied to a problem that matters." },
+                { label: "Interest Area",  title: "Cosmology & the Early Universe", body: "The questions that pull me most are the large-scale ones — what triggered the Big Bang, what dark matter actually is, and how dark energy is driving the accelerating expansion of the universe. These are not just abstract puzzles. They define the structure of everything that exists." },
+                { label: "Coming Soon",    title: "Research Notes & Publications", body: "Findings, data summaries, and writeups from ongoing PVIC research will be published here as the work progresses." },
               ].map((c) => (
                 <div className="placeholder-card" key={c.title}>
                   <span className="placeholder-card-label">{c.label}</span>
@@ -291,9 +290,9 @@ export default function Page() {
             <h2 className="section-title">Sound as<br />a System.</h2>
             <div className="placeholder-grid">
               {[
-                { label: "Genre",       title: "Electronic / House",   body: "Deep house, techno, ambient electronic — music as architecture." },
-                { label: "Practice",    title: "DJing & Production",   body: "Mixing, beat construction, and live set curation." },
-                { label: "Coming Soon", title: "Mixes & Releases",     body: "Recorded sets and original tracks will be shared here." },
+                { label: "Genre", title: "House, Techno, Ambient", body: "I mix electronic music that leans atmospheric — deep house, minimal techno, and ambient textures that build space rather than just energy. The goal is always immersion over impact." },
+                { label: "Practice", title: "Set Building", body: "DJing is how I think about flow and structure outside the lab. A good set moves like a narrative — tension, release, texture, resolution. I build sets that feel like a journey from start to finish, not just a playlist." },
+                { label: "Coming Soon", title: "Recorded Sets", body: "Mixes and recorded sets will be available here. If you want to hear something in the meantime, reach out." },
               ].map((c) => (
                 <div className="placeholder-card" key={c.title}>
                   <span className="placeholder-card-label">{c.label}</span>
@@ -312,9 +311,9 @@ export default function Page() {
             <h2 className="section-title">Problems on<br />Rock.</h2>
             <div className="placeholder-grid">
               {[
-                { label: "Discipline",  title: "Bouldering & Sport",   body: "Technical problem-solving on rock, indoors and out." },
-                { label: "Leadership",  title: "Wilderness Exploration Club", body: "Planning and executing large-scale outdoor trips as club president." },
-                { label: "Coming Soon", title: "Trip Gallery",          body: "Photos and routes from expeditions, trail logs, and trip reports." },
+                { label: "Discipline", title: "Intermediate Climbing", body: "Mostly indoor right now, working toward more outdoor routes. Climbing, for me, is a mental discipline as much as a physical one — reading a problem, committing to a sequence, staying precise under pressure. The same qualities that make a good researcher." },
+                { label: "Leadership", title: "Wilderness Exploration Club", body: "As President, I plan and execute day hikes, climbing sessions, and multi-day wilderness trips for the club. Logistics, safety, and keeping people moving — it is a different kind of systems problem, but a real one." },
+                { label: "Coming Soon", title: "Trip Reports & Routes", body: "Photos, trip logs, and notable routes from club expeditions will be documented here." },
               ].map((c) => (
                 <div className="placeholder-card" key={c.title}>
                   <span className="placeholder-card-label">{c.label}</span>
