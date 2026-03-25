@@ -7,49 +7,30 @@ type NavbarProps = {
 }
 
 export default function Navbar({ mode, setMode, scrollToSection }: NavbarProps) {
+  const navItems = [
+    { key: "home", label: "Home" },
+    { key: "about", label: "About" },
+    { key: "projects", label: "Projects" },
+    { key: "physics", label: "Physics" },
+    { key: "music", label: "Music" },
+    { key: "climbing", label: "Climbing" },
+    { key: "contact", label: "Contact" },
+  ]
+
   return (
     <div className="navbar">
-
-      <button
-        className={mode === "home" ? "active" : ""}
-        onClick={() => {
-          setMode("home")
-          scrollToSection("home")
-        }}
-      >
-        Home
-      </button>
-
-      <button
-        className={mode === "physics" ? "active" : ""}
-        onClick={() => {
-          setMode("physics")
-          scrollToSection("physics")
-        }}
-      >
-        Physics
-      </button>
-
-      <button
-        className={mode === "music" ? "active" : ""}
-        onClick={() => {
-          setMode("music")
-          scrollToSection("music")
-        }}
-      >
-        Music
-      </button>
-
-      <button
-        className={mode === "climbing" ? "active" : ""}
-        onClick={() => {
-          setMode("climbing")
-          scrollToSection("climbing")
-        }}
-      >
-        Climbing
-      </button>
-
+      {navItems.map(({ key, label }) => (
+        <button
+          key={key}
+          className={mode === key ? "active" : ""}
+          onClick={() => {
+            setMode(key)
+            scrollToSection(key)
+          }}
+        >
+          {label}
+        </button>
+      ))}
     </div>
   )
 }
