@@ -38,6 +38,7 @@ export default function Timeline() {
       <h2 className="section-title">The Timeline</h2>
 
       <div className="timeline-track">
+        <div className="timeline-line" />
         {MILESTONES.map((m, i) => (
           <div
             key={i}
@@ -51,7 +52,6 @@ export default function Timeline() {
             </div>
           </div>
         ))}
-        <div className="timeline-line" />
       </div>
     </section>
   )

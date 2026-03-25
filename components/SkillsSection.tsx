@@ -2,12 +2,12 @@
 import { useEffect, useRef, useState } from "react"
 
 const SKILLS = [
-  { label: "JV / EQE Characterization", level: 9, color: "#00e5ff" },
-  { label: "ALD / Sputtering",          level: 8, color: "#4db8ff" },
-  { label: "Leadership",                level: 9, color: "#00e5ff" },
-  { label: "JMP / IGOR",               level: 7, color: "#4db8ff" },
-  { label: "Python",                    level: 6, color: "#7ed957" },
-  { label: "Web / Design",             level: 5, color: "#7ed957" },
+  { label: "JV / EQE Characterization", level: 9, tag: "Expert",      color: "#00e5ff" },
+  { label: "ALD / Sputtering",          level: 8, tag: "Advanced",    color: "#4db8ff" },
+  { label: "Leadership",                level: 9, tag: "Expert",      color: "#00e5ff" },
+  { label: "JMP / IGOR",               level: 7, tag: "Proficient",   color: "#4db8ff" },
+  { label: "Python",                    level: 6, tag: "Proficient",   color: "#7ed957" },
+  { label: "Web / Design",             level: 5, tag: "Intermediate", color: "#7ed957" },
 ]
 
 export default function SkillsSection() {
@@ -34,7 +34,7 @@ export default function SkillsSection() {
           <div className="skill-row" key={s.label}>
             <div className="skill-meta">
               <span className="skill-label">{s.label}</span>
-              <span className="skill-level">{s.level} / 10</span>
+              <span className="skill-level">{s.tag}</span>
             </div>
             <div className="skill-track">
               <div

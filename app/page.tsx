@@ -11,6 +11,7 @@ import EasterEgg from "../components/EasterEgg"
 
 export default function Page() {
   const [loaded, setLoaded] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const [mode, setMode] = useState("home")
 
   const homeRef     = useRef<HTMLElement>(null)
@@ -20,6 +21,13 @@ export default function Page() {
   const musicRef    = useRef<HTMLElement>(null)
   const climbingRef = useRef<HTMLElement>(null)
   const contactRef  = useRef<HTMLElement>(null)
+
+  // ─── SCROLL HINT FADE ─────────────────────────────────────────────
+  useEffect(() => {
+    const onScroll = () => { if (window.scrollY > 60) setScrolled(true) }
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
 
   // ─── SCROLL → MODE DETECTION ──────────────────────────────────────
   useEffect(() => {
@@ -163,7 +171,7 @@ export default function Page() {
 
           {/* Star Wars crawl */}
           <div className="crawl-wrapper">
-            <div className="crawl-inner">
+            <div className={`crawl-inner${loaded ? "" : " crawl-paused"}`}>
               <p>
                 From solar cells to distant galaxies,
                 from sound waves to mountain walls —
@@ -178,7 +186,7 @@ export default function Page() {
             </div>
           </div>
 
-          <span className="home-scroll-hint">scroll to explore</span>
+          <span className="home-scroll-hint" style={{ opacity: scrolled ? 0 : undefined }}>scroll to explore</span>
         </section>
 
         {/* ── ABOUT ─────────────────────────────────────────────────── */}

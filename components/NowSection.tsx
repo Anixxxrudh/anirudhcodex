@@ -10,7 +10,10 @@ const NOW = [
 export default function NowSection() {
   return (
     <section className="now-section">
-      <div className="section-eyebrow">Present</div>
+      <div className="section-eyebrow">
+        <span className="now-live-dot" />
+        Present
+      </div>
       <h2 className="section-title">Now</h2>
       <div className="now-grid">
         {NOW.map((n) => (

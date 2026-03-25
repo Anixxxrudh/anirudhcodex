@@ -220,6 +220,7 @@ section {
   color: var(--c-dim);
   text-transform: uppercase;
   animation: pulse 2.5s ease-in-out infinite;
+  transition: opacity 0.6s ease;
 }
 
 /* ─── STAR WARS CRAWL ───────────────────────────────────────────────── */
@@ -236,6 +237,8 @@ section {
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
   pointer-events: none;
 }
+
+.crawl-paused { animation-play-state: paused; }
 
 .crawl-inner {
   position: absolute;
@@ -380,11 +383,27 @@ section {
   gap: 14px;
   transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
   cursor: none;
+  position: relative;
 }
 .project-card:hover {
   border-color: rgba(77,184,255,0.35);
   background: rgba(77,184,255,0.04);
   transform: translateY(-3px);
+}
+
+.project-card::after {
+  content: '↗';
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  font-size: 0.85rem;
+  color: rgba(77,184,255,0);
+  transition: color 0.25s ease, transform 0.25s ease;
+  transform: translate(-4px, 4px);
+}
+.project-card:hover::after {
+  color: rgba(77,184,255,0.6);
+  transform: translate(0, 0);
 }
 .project-card--dim {
   opacity: 0.35;
@@ -845,6 +864,23 @@ section {
   .timeline-left  .timeline-card,
   .timeline-right .timeline-card { width: 100%; margin: 0; text-align: left; }
   .timeline-dot { left: 16px; }
+}
+
+/* ─── NOW LIVE DOT ──────────────────────────────────────────────────── */
+.now-live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c-blue);
+  box-shadow: 0 0 8px var(--c-blue);
+  animation: livePulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
 }
 
 /* ─── NOW SECTION ───────────────────────────────────────────────────── */
