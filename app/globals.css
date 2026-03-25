@@ -756,3 +756,283 @@ section {
   #cursor-nucleus, #cursor-orbit, #cursor-electron { display: none; }
   body { cursor: auto; }
 }
+
+/* ─── TIMELINE ──────────────────────────────────────────────────────── */
+.timeline-section {
+  padding: 120px clamp(24px, 6vw, 96px) 80px;
+  position: relative;
+  z-index: 2;
+}
+
+.timeline-track {
+  position: relative;
+  max-width: 900px;
+  margin: 60px auto 0;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 50%;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(77,184,255,0.3) 10%, rgba(77,184,255,0.3) 90%, transparent);
+  transform: translateX(-50%);
+}
+
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 56px;
+  opacity: 0;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  position: relative;
+}
+
+.timeline-left  { flex-direction: row-reverse; transform: translateX(-40px); }
+.timeline-right { flex-direction: row;         transform: translateX(40px); }
+.timeline-visible { opacity: 1 !important; transform: translateX(0) !important; }
+
+.timeline-dot {
+  position: absolute;
+  left: 50%;
+  top: 12px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--c-blue);
+  box-shadow: 0 0 12px rgba(77,184,255,0.7);
+  transform: translateX(-50%);
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.timeline-card {
+  width: 42%;
+  padding: 20px 24px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.02);
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+  cursor: default;
+}
+.timeline-left  .timeline-card { margin-right: calc(8% + 20px); text-align: right; }
+.timeline-right .timeline-card { margin-left:  calc(8% + 20px); }
+
+.timeline-card:hover {
+  border-color: rgba(77,184,255,0.4);
+  box-shadow: 0 0 24px rgba(77,184,255,0.08);
+  transform: translateY(-2px);
+}
+
+.timeline-year {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--c-blue);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.timeline-text {
+  font-size: 0.88rem;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.65);
+}
+
+@media (max-width: 700px) {
+  .timeline-line { left: 16px; }
+  .timeline-item { flex-direction: column !important; padding-left: 40px; }
+  .timeline-left  .timeline-card,
+  .timeline-right .timeline-card { width: 100%; margin: 0; text-align: left; }
+  .timeline-dot { left: 16px; }
+}
+
+/* ─── NOW SECTION ───────────────────────────────────────────────────── */
+.now-section {
+  padding: 80px clamp(24px, 6vw, 96px);
+  position: relative;
+  z-index: 2;
+  max-width: 1060px;
+  margin: 0 auto;
+}
+
+.now-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 48px;
+}
+
+.now-card {
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.025);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+}
+.now-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(77,184,255,0.3);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 20px rgba(77,184,255,0.05);
+}
+
+.now-label {
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-blue);
+  opacity: 0.8;
+}
+
+.now-value {
+  font-size: 0.88rem;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.68);
+}
+
+/* ─── SKILLS SECTION ────────────────────────────────────────────────── */
+.skills-section {
+  padding: 80px clamp(24px, 6vw, 96px);
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-top: 48px;
+}
+
+.skill-row { display: flex; flex-direction: column; gap: 8px; }
+
+.skill-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.skill-label {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.75);
+}
+
+.skill-level {
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.3);
+}
+
+.skill-track {
+  height: 3px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.skill-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+
+/* ─── EASTER EGG ────────────────────────────────────────────────────── */
+.glitch-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  pointer-events: none;
+  animation: glitchFlash 0.6s ease forwards;
+  background: rgba(77,184,255,0.06);
+}
+
+@keyframes glitchFlash {
+  0%   { opacity: 0; clip-path: inset(20% 0 60% 0); }
+  15%  { opacity: 1; clip-path: inset(40% 0 20% 0); transform: translateX(-4px); }
+  30%  { opacity: 0.5; clip-path: inset(10% 0 50% 0); transform: translateX(4px); }
+  50%  { opacity: 1; clip-path: inset(60% 0 10% 0); transform: translateX(-2px); }
+  75%  { opacity: 0.3; transform: translateX(0); }
+  100% { opacity: 0; }
+}
+
+.easter-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: rgba(0,0,0,0.88);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.4s ease;
+  cursor: none;
+}
+
+.easter-box {
+  border: 1px solid rgba(77,184,255,0.3);
+  border-radius: 8px;
+  padding: 48px 56px;
+  max-width: 500px;
+  text-align: center;
+  background: rgba(0,10,20,0.9);
+  box-shadow: 0 0 60px rgba(77,184,255,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.easter-status {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 0.35em;
+  color: var(--c-blue);
+  text-shadow: 0 0 16px rgba(77,184,255,0.8);
+}
+
+.easter-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.04em;
+}
+
+.easter-body {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.5);
+}
+
+.easter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.easter-item {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: rgba(77,184,255,0.8);
+}
+
+.easter-close {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: 0.1em;
+  margin-top: 8px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

@@ -3,8 +3,14 @@
 import { useState, useEffect, useRef } from "react"
 import BackgroundCanvas from "../components/BackgroundCanvas"
 import Navbar from "../components/Navbar"
+import LoadingScreen from "../components/LoadingScreen"
+import Timeline from "../components/Timeline"
+import NowSection from "../components/NowSection"
+import SkillsSection from "../components/SkillsSection"
+import EasterEgg from "../components/EasterEgg"
 
 export default function Page() {
+  const [loaded, setLoaded] = useState(false)
   const [mode, setMode] = useState("home")
 
   const homeRef     = useRef<HTMLElement>(null)
@@ -129,6 +135,12 @@ export default function Page() {
 
   return (
     <>
+      {/* Loading screen */}
+      {!loaded && <LoadingScreen onComplete={() => setLoaded(true)} />}
+
+      {/* Easter egg */}
+      <EasterEgg />
+
       {/* Atom cursor */}
       <div id="cursor-nucleus" />
       <div id="cursor-orbit"   />
@@ -353,6 +365,15 @@ export default function Page() {
             </div>
           </div>
         </section>
+
+        {/* ── TIMELINE ──────────────────────────────────────────────── */}
+        <Timeline />
+
+        {/* ── NOW ───────────────────────────────────────────────────── */}
+        <NowSection />
+
+        {/* ── SKILLS ────────────────────────────────────────────────── */}
+        <SkillsSection />
 
         {/* ── CONTACT ───────────────────────────────────────────────── */}
         <section ref={contactRef} className="contact-section">

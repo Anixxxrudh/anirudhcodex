@@ -1,0 +1,58 @@
+"use client"
+import { useEffect, useRef, useState } from "react"
+
+const MILESTONES = [
+  { year: "2023", text: "Started undergraduate journey at University of Toledo — Physics / Astrophysics track." },
+  { year: "2024", text: "Joined Wright Center for Photovoltaics Innovation (PVIC) research lab." },
+  { year: "2025", text: "Began working on CdTe solar cell interface optimization using SWCNT networks and ALD-deposited Al₂O₃." },
+  { year: "2025", text: "Presented research at NSM Undergraduate Research Expo." },
+  { year: "2026", text: "Selected for Klar Leadership Academy." },
+  { year: "2026", text: "Presented research at Carlson Library Undergraduate Exhibition." },
+]
+
+export default function Timeline() {
+  const [visible, setVisible] = useState<boolean[]>(Array(MILESTONES.length).fill(false))
+  const refs = useRef<(HTMLDivElement | null)[]>([])
+
+  useEffect(() => {
+    const observers = refs.current.map((el, i) => {
+      if (!el) return null
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setVisible(v => { const n = [...v]; n[i] = true; return n })
+            obs.disconnect()
+          }
+        },
+        { threshold: 0.3 }
+      )
+      obs.observe(el)
+      return obs
+    })
+    return () => observers.forEach(o => o?.disconnect())
+  }, [])
+
+  return (
+    <section className="timeline-section">
+      <div className="section-eyebrow">Journey</div>
+      <h2 className="section-title">The Timeline</h2>
+
+      <div className="timeline-track">
+        {MILESTONES.map((m, i) => (
+          <div
+            key={i}
+            ref={el => { refs.current[i] = el }}
+            className={`timeline-item ${i % 2 === 0 ? "timeline-left" : "timeline-right"} ${visible[i] ? "timeline-visible" : ""}`}
+          >
+            <div className="timeline-dot" />
+            <div className="timeline-card">
+              <span className="timeline-year">{m.year}</span>
+              <p className="timeline-text">{m.text}</p>
+            </div>
+          </div>
+        ))}
+        <div className="timeline-line" />
+      </div>
+    </section>
+  )
+}
