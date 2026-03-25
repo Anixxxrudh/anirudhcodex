@@ -425,7 +425,7 @@ export default function Page() {
               <span className="contact-link-label">University Email</span>
               <span className="contact-link-value">akunnat3@rockets.utoledo.edu</span>
             </a>
-            <a href="mailto:anirudhmenon2k10@gmail.com" className="contact-link contact-link--secondary">
+            <a href="mailto:anirudhmenon2k10@gmail.com" className="contact-link">
               <span className="contact-link-label">Personal</span>
               <span className="contact-link-value">anirudhmenon2k10@gmail.com</span>
             </a>
