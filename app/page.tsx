@@ -8,11 +8,15 @@ import Timeline from "../components/Timeline"
 import NowSection from "../components/NowSection"
 import SkillsSection from "../components/SkillsSection"
 import EasterEgg from "../components/EasterEgg"
+import ParticleField from "../components/ParticleField"
 
 export default function Page() {
   const [loaded, setLoaded] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [scrollProgress, setScrollProgress] = useState(0)
   const [mode, setMode] = useState("home")
+
+  const titleRef = useRef<HTMLHeadingElement>(null)
 
   const homeRef     = useRef<HTMLElement>(null)
   const aboutRef    = useRef<HTMLElement>(null)
@@ -22,11 +26,31 @@ export default function Page() {
   const climbingRef = useRef<HTMLElement>(null)
   const contactRef  = useRef<HTMLElement>(null)
 
-  // ─── SCROLL HINT FADE ─────────────────────────────────────────────
+  // ─── SCROLL: hint fade + progress bar ────────────────────────────
   useEffect(() => {
-    const onScroll = () => { if (window.scrollY > 60) setScrolled(true) }
+    const onScroll = () => {
+      if (window.scrollY > 60) setScrolled(true)
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      setScrollProgress(max > 0 ? window.scrollY / max : 0)
+    }
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  // ─── PARALLAX TITLE ───────────────────────────────────────────────
+  useEffect(() => {
+    if (window.innerWidth < 768) return
+    const onMove = (e: MouseEvent) => {
+      const el = titleRef.current
+      if (!el) return
+      const cx = window.innerWidth  / 2
+      const cy = window.innerHeight / 2
+      const x  = ((e.clientX - cx) / cx) * 12
+      const y  = ((e.clientY - cy) / cy) * 12
+      el.style.transform = `translate(${x}px, ${y}px)`
+    }
+    window.addEventListener("mousemove", onMove)
+    return () => window.removeEventListener("mousemove", onMove)
   }, [])
 
   // ─── SCROLL → MODE DETECTION ──────────────────────────────────────
@@ -143,6 +167,9 @@ export default function Page() {
 
   return (
     <>
+      {/* Scroll progress bar */}
+      <div className="scroll-progress" style={{ width: `${scrollProgress * 100}%` }} />
+
       {/* Loading screen */}
       {!loaded && <LoadingScreen onComplete={() => setLoaded(true)} />}
 
@@ -164,7 +191,8 @@ export default function Page() {
 
         {/* ── HOME ──────────────────────────────────────────────────── */}
         <section ref={homeRef} className="home-section">
-          <h1 className="home-name">THE ANIRUDH PROTOCOL</h1>
+          <ParticleField />
+          <h1 ref={titleRef} className="home-name">THE ANIRUDH PROTOCOL</h1>
           <p className="home-tagline">
             Astrophysics&nbsp;&nbsp;·&nbsp;&nbsp;Photovoltaics&nbsp;&nbsp;·&nbsp;&nbsp;Climbing&nbsp;&nbsp;·&nbsp;&nbsp;Music
           </p>
