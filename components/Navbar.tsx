@@ -6,20 +6,20 @@ type NavbarProps = {
   scrollToSection: (section: string) => void
 }
 
-export default function Navbar({ mode, setMode, scrollToSection }: NavbarProps) {
-  const navItems = [
-    { key: "home", label: "Home" },
-    { key: "about", label: "About" },
-    { key: "projects", label: "Projects" },
-    { key: "physics", label: "Physics" },
-    { key: "music", label: "Music" },
-    { key: "climbing", label: "Climbing" },
-    { key: "contact", label: "Contact" },
-  ]
+const NAV_ITEMS = [
+  { key: "home",     label: "Home"     },
+  { key: "about",    label: "About"    },
+  { key: "projects", label: "Projects" },
+  { key: "physics",  label: "Physics"  },
+  { key: "music",    label: "Music"    },
+  { key: "climbing", label: "Climbing" },
+  { key: "contact",  label: "Contact"  },
+]
 
+export default function Navbar({ mode, setMode, scrollToSection }: NavbarProps) {
   return (
-    <div className="navbar">
-      {navItems.map(({ key, label }) => (
+    <nav className="navbar">
+      {NAV_ITEMS.map(({ key, label }) => (
         <button
           key={key}
           className={mode === key ? "active" : ""}
@@ -31,6 +31,6 @@ export default function Navbar({ mode, setMode, scrollToSection }: NavbarProps) 
           {label}
         </button>
       ))}
-    </div>
+    </nav>
   )
 }
