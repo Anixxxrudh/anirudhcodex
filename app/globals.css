@@ -690,6 +690,7 @@ section {
 }
 
 /* ─── RESUME ─────────────────────────────────────────────────────────── */
+.resume-block {
   margin-top: 60px;
   display: flex;
   flex-direction: column;
