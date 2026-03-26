@@ -29,7 +29,6 @@ interface SolarState {
   lastPulse: number
   trail: { x: number; y: number }[]
   clickFlash: number
-  clickBurst: boolean
 }
 function initSolar(): SolarState {
   return {
@@ -38,14 +37,13 @@ function initSolar(): SolarState {
     lastPulse: 0,
     trail: [],
     clickFlash: 0,
-    clickBurst: false,
   }
 }
 
 function drawSolar(
   ctx: CanvasRenderingContext2D,
   st: SolarState,
-  hovered: boolean, clicked: boolean,
+  hovered: boolean, justClicked: boolean,
   mx: number, my: number,
   vx: number, vy: number,
   now: number
@@ -70,13 +68,10 @@ function drawSolar(
     ctx.fill()
   }
 
-  // Click flash
-  if (clicked && !st.clickBurst) {
-    st.clickBurst = true
+  if (justClicked) {
     st.clickFlash = 2
     st.cells.forEach(c => { c.alpha = 1; c.target = 0.12 })
   }
-  if (!clicked) st.clickBurst = false
   if (st.clickFlash > 0) st.clickFlash--
 
   // Idle pulse: random cell every 300ms
@@ -163,16 +158,15 @@ interface Star {
 interface ConstellationState {
   stars: Star[]
   lastSpawn: number
-  burst: boolean
 }
 function initConstellation(): ConstellationState {
-  return { stars: [], lastSpawn: 0, burst: false }
+  return { stars: [], lastSpawn: 0 }
 }
 
 function drawConstellation(
   ctx: CanvasRenderingContext2D,
   st: ConstellationState,
-  hovered: boolean, clicked: boolean,
+  hovered: boolean, justClicked: boolean,
   mx: number, my: number, pmx: number, pmy: number,
   now: number
 ) {
@@ -191,9 +185,7 @@ function drawConstellation(
     st.lastSpawn = now
   }
 
-  // Click burst: 6 stars
-  if (clicked && !st.burst) {
-    st.burst = true
+  if (justClicked) {
     for (let i = 0; i < 6; i++) {
       const a = (i / 6) * Math.PI * 2
       st.stars.push({
@@ -205,7 +197,6 @@ function drawConstellation(
     }
     if (st.stars.length > 18) st.stars = st.stars.slice(-12)
   }
-  if (!clicked) st.burst = false
 
   // Update stars
   const alive: Star[] = []
@@ -253,13 +244,13 @@ function drawConstellation(
 // CURSOR 3: PULSAR
 // ─────────────────────────────────────────────────────────────────────────────
 interface PRing { t0: number; maxR: number; dur: number }
-interface PulsarState { rings: PRing[]; lastEmit: number; burst: boolean }
-function initPulsar(): PulsarState { return { rings: [], lastEmit: 0, burst: false } }
+interface PulsarState { rings: PRing[]; lastEmit: number }
+function initPulsar(): PulsarState { return { rings: [], lastEmit: 0 } }
 
 function drawPulsar(
   ctx: CanvasRenderingContext2D,
   st: PulsarState,
-  hovered: boolean, clicked: boolean,
+  hovered: boolean, justClicked: boolean,
   vx: number, vy: number, now: number
 ) {
   ctx.clearRect(0, 0, W, W)
@@ -270,14 +261,12 @@ function drawPulsar(
     st.rings.push({ t0: now, maxR: 36, dur: 1000 })
     st.lastEmit = now
   }
-  if (clicked && !st.burst) {
-    st.burst = true
-    st.rings.push({ t0: now,      maxR: 60, dur: 800 })
-    st.rings.push({ t0: now - 80, maxR: 36, dur: 800 })
+  if (justClicked) {
+    st.rings.push({ t0: now,       maxR: 60, dur: 800 })
+    st.rings.push({ t0: now - 80,  maxR: 36, dur: 800 })
     st.rings.push({ t0: now - 160, maxR: 36, dur: 800 })
     if (st.rings.length > 9) st.rings = st.rings.slice(-9)
   }
-  if (!clicked) st.burst = false
 
   // Purge old rings
   st.rings = st.rings.filter(r => now - r.t0 < r.dur)
@@ -313,31 +302,24 @@ interface GlitchState {
   glitching: boolean
   gframe: number; gdur: number
   lastGlitch: number; nextGlitch: number
-  burst: boolean
 }
 function initGlitch(): GlitchState {
   return {
     glitching: false, gframe: 0, gdur: 0,
     lastGlitch: 0, nextGlitch: 2000 + Math.random() * 2000,
-    burst: false,
   }
 }
 
 function drawGlitch(
   ctx: CanvasRenderingContext2D,
   st: GlitchState,
-  hovered: boolean, clicked: boolean,
+  hovered: boolean, justClicked: boolean,
   vx: number, vy: number, now: number
 ) {
   ctx.clearRect(0, 0, W, W)
   const speed = Math.hypot(vx, vy)
 
-  // Click burst
-  if (clicked && !st.burst) {
-    st.burst = true
-    st.glitching = true; st.gframe = 0; st.gdur = 15
-  }
-  if (!clicked) st.burst = false
+  if (justClicked) { st.glitching = true; st.gframe = 0; st.gdur = 15 }
 
   // Auto glitch
   const interval = hovered ? 800 : st.nextGlitch
@@ -359,7 +341,7 @@ function drawGlitch(
   }
 
   if (st.glitching) {
-    const os = clicked ? 8 : 4
+    const os = justClicked ? 8 : 4
     ctx.globalAlpha = 0.7
     drawAt(os, -os / 2, "rgba(255,50,50,0.9)", [2, 4])
     drawAt(-os, os / 2, "rgba(50,255,200,0.9)", [2, 4])
@@ -388,16 +370,15 @@ interface MagState {
   clickPhase: number
   targets: MagTarget[]
   lastTargetUpdate: number
-  burst: boolean
 }
 function initMagnetic(): MagState {
-  return { rx: -9999, ry: -9999, breath: 0, clickPhase: 0, targets: [], lastTargetUpdate: 0, burst: false }
+  return { rx: -9999, ry: -9999, breath: 0, clickPhase: 0, targets: [], lastTargetUpdate: 0 }
 }
 
 function drawMagnetic(
   ctx: CanvasRenderingContext2D,
   st: MagState,
-  hovered: boolean, clicked: boolean,
+  hovered: boolean, justClicked: boolean,
   mx: number, my: number, now: number
 ) {
   ctx.clearRect(0, 0, W, W)
@@ -429,9 +410,7 @@ function drawMagnetic(
   const pullLen = Math.hypot(pullX, pullY)
   if (pullLen > 24) { pullX = pullX / pullLen * 24; pullY = pullY / pullLen * 24 }
 
-  // Click spring
-  if (clicked && !st.burst) { st.burst = true; st.clickPhase = 0.01 }
-  if (!clicked) st.burst = false
+  if (justClicked) st.clickPhase = 0.01
   if (st.clickPhase > 0) { st.clickPhase += 0.3; if (st.clickPhase > Math.PI * 2) st.clickPhase = 0 }
   const springMult = st.clickPhase > 0 ? 1 - 0.35 * Math.sin(st.clickPhase) : 1
 
@@ -622,6 +601,7 @@ export default function CursorSystem() {
   const vx = useRef(0), vy = useRef(0)
   const isHovered = useRef(false)
   const isClicked = useRef(false)
+  const prevClicked = useRef(false)
 
   // Keep mode ref in sync so rAF closure always has the current mode
   const modeRef = useRef<CursorMode>("solar")
@@ -662,24 +642,33 @@ export default function CursorSystem() {
     const onDown = () => { isClicked.current = true }
     const onUp   = () => { isClicked.current = false }
 
+    let hoverCheckX = -999, hoverCheckY = -999
+
     const draw = (now: number) => {
-      // Hover detection each frame via elementFromPoint
-      if (mx.current !== -999) {
-        const el = document.elementFromPoint(mx.current, my.current)
-        isHovered.current = !!(el && el !== canvas && el.closest(HOVER_SEL))
+      // elementFromPoint only when mouse has moved — skip on stationary frames
+      if (mx.current !== hoverCheckX || my.current !== hoverCheckY) {
+        hoverCheckX = mx.current; hoverCheckY = my.current
+        if (mx.current !== -999) {
+          const el = document.elementFromPoint(mx.current, my.current)
+          isHovered.current = !!(el && el !== canvas && el.closest(HOVER_SEL))
+        }
       }
+
+      // Edge-detect click: true only on the first frame of a mousedown
+      const justClicked = isClicked.current && !prevClicked.current
+      prevClicked.current = isClicked.current
 
       const m = modeRef.current
       if (m === "solar") {
-        drawSolar(ctx, solarSt.current, isHovered.current, isClicked.current, mx.current, my.current, vx.current, vy.current, now)
+        drawSolar(ctx, solarSt.current, isHovered.current, justClicked, mx.current, my.current, vx.current, vy.current, now)
       } else if (m === "constellation") {
-        drawConstellation(ctx, constellationSt.current, isHovered.current, isClicked.current, mx.current, my.current, pmx.current, pmy.current, now)
+        drawConstellation(ctx, constellationSt.current, isHovered.current, justClicked, mx.current, my.current, pmx.current, pmy.current, now)
       } else if (m === "pulsar") {
-        drawPulsar(ctx, pulsarSt.current, isHovered.current, isClicked.current, vx.current, vy.current, now)
+        drawPulsar(ctx, pulsarSt.current, isHovered.current, justClicked, vx.current, vy.current, now)
       } else if (m === "glitch") {
-        drawGlitch(ctx, glitchSt.current, isHovered.current, isClicked.current, vx.current, vy.current, now)
+        drawGlitch(ctx, glitchSt.current, isHovered.current, justClicked, vx.current, vy.current, now)
       } else if (m === "magnetic") {
-        drawMagnetic(ctx, magneticSt.current, isHovered.current, isClicked.current, mx.current, my.current, now)
+        drawMagnetic(ctx, magneticSt.current, isHovered.current, justClicked, mx.current, my.current, now)
       }
 
       animId = requestAnimationFrame(draw)

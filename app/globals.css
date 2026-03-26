@@ -2638,3 +2638,65 @@ section {
   margin-top: 12px;
 }
 .classified-hint:hover { color: rgba(255,80,80,0.35); }
+
+/* ─── WORMHOLE TRANSITION ────────────────────────────────────────────── */
+.wormhole-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: #000;
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: wormhole-bg 0.7s ease-in-out forwards;
+}
+
+.wormhole-core {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(77, 184, 255, 1);
+  box-shadow:
+    0 0 12px 4px rgba(77, 184, 255, 0.9),
+    0 0 40px 12px rgba(77, 184, 255, 0.5),
+    0 0 80px 24px rgba(77, 184, 255, 0.2);
+  animation: wormhole-core-pulse 0.7s ease-out forwards;
+}
+
+.wormhole-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid rgba(77, 184, 255, 0.85);
+  animation: wormhole-ring-expand 0.62s ease-out forwards;
+  will-change: transform, opacity;
+}
+.wormhole-ring:nth-child(2)  { width: 24px;  height: 24px;  border-color: rgba(77,184,255,0.90); }
+.wormhole-ring:nth-child(3)  { width: 44px;  height: 44px;  border-color: rgba(77,184,255,0.82); }
+.wormhole-ring:nth-child(4)  { width: 70px;  height: 70px;  border-color: rgba(77,184,255,0.74); }
+.wormhole-ring:nth-child(5)  { width: 104px; height: 104px; border-color: rgba(77,184,255,0.65); }
+.wormhole-ring:nth-child(6)  { width: 146px; height: 146px; border-color: rgba(77,184,255,0.55); }
+.wormhole-ring:nth-child(7)  { width: 196px; height: 196px; border-color: rgba(77,184,255,0.44); }
+.wormhole-ring:nth-child(8)  { width: 254px; height: 254px; border-color: rgba(77,184,255,0.32); }
+.wormhole-ring:nth-child(9)  { width: 320px; height: 320px; border-color: rgba(77,184,255,0.20); }
+
+@keyframes wormhole-ring-expand {
+  0%   { transform: scale(0.08); opacity: 1; }
+  65%  { opacity: 0.7; }
+  100% { transform: scale(9);    opacity: 0; }
+}
+
+@keyframes wormhole-core-pulse {
+  0%   { transform: scale(0);    opacity: 0; }
+  12%  { transform: scale(1);    opacity: 1; }
+  55%  { transform: scale(2);    opacity: 1; }
+  100% { transform: scale(24);   opacity: 0; }
+}
+
+@keyframes wormhole-bg {
+  0%   { opacity: 0; }
+  6%   { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
+}

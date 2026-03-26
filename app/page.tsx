@@ -60,6 +60,9 @@ export default function Page() {
   const [activeSection, setActiveSection] = useState(0)
   const [cmdOpen,       setCmdOpen]       = useState(false)
   const [kbTooltip,     setKbTooltip]     = useState(false)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+
+  const transitioning = useRef(false)
 
   const snapRef  = useRef<HTMLDivElement>(null)
   const flashRef = useRef<HTMLDivElement>(null)
@@ -107,6 +110,15 @@ export default function Page() {
     } as Record<string, React.RefObject<HTMLElement | null>>
     map[section]?.current?.scrollIntoView({ behavior: "smooth" })
   }, [])
+
+  // ─── WORMHOLE NAV (navbar clicks only) ───────────────────────────
+  const navigateWithTransition = useCallback((section: string) => {
+    if (transitioning.current) return
+    transitioning.current = true
+    setIsTransitioning(true)
+    setTimeout(() => scrollToSection(section), 350)
+    setTimeout(() => { setIsTransitioning(false); transitioning.current = false }, 700)
+  }, [scrollToSection])
 
   // ─── DERIVE MODE FROM ACTIVE SECTION ─────────────────────────────
   useEffect(() => {
@@ -320,6 +332,16 @@ export default function Page() {
       {/* Cinematic full-screen flash */}
       <div ref={fullFlashRef} id="section-flash-full" />
 
+      {/* Wormhole transition overlay */}
+      {isTransitioning && (
+        <div className="wormhole-overlay">
+          <div className="wormhole-core" />
+          {Array.from({ length: 8 }, (_, i) => (
+            <div key={i} className="wormhole-ring" style={{ animationDelay: `${i * 35}ms` }} />
+          ))}
+        </div>
+      )}
+
       {/* Loading screen */}
       {!loaded && <LoadingScreen onComplete={() => setLoaded(true)} />}
 
@@ -333,7 +355,7 @@ export default function Page() {
       <BackgroundCanvas mode={mode} />
 
       {/* Navbar */}
-      <Navbar setMode={setMode} mode={mode} scrollToSection={scrollToSection} />
+      <Navbar setMode={setMode} mode={mode} scrollToSection={navigateWithTransition} />
 
       {/* ⌘K hint */}
       <button
