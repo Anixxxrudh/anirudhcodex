@@ -41,7 +41,7 @@ const FLASH_CLASS: Record<string, string> = {
   about:    "flash-blue",
   projects: "flash-blue",
   physics:  "flash-blue",
-  music:    "flash-orange",
+  music:    "flash-blue",
   climbing: "flash-green",
   contact:  "flash-blue",
 }
@@ -593,34 +593,63 @@ export default function Page() {
           </section>
 
           {/* ── MUSIC ───────────────────────────────────────────── */}
-          <section ref={musicRef} className="fade-section snap-section" data-mode="music" style={{ paddingTop: "100px", paddingBottom: "80px", position: "relative", overflow: "hidden" }}>
+          <section ref={musicRef} className="fade-section snap-section music-section" data-mode="music" style={{ position: "relative", overflow: "hidden" }}>
             <MusicNotesCanvas />
             <span className="section-ghost-number">04</span>
-            <div className="placeholder-section mode-music">
-              <div className="section-eyebrow">Music / DJ</div>
-              <ScrambleText text={"Sound as\na System."} className="section-title" />
-              <div className="placeholder-grid">
-                {[
-                  { label: "Genre",   title: "House, Techno, Ambient",  body: "I mix electronic music that leans atmospheric — deep house, minimal techno, and ambient textures that build space rather than just energy. The goal is always immersion over impact." },
-                  { label: "Practice", title: "Set Building",           body: "DJing is how I think about flow and structure outside the lab. A good set moves like a narrative — tension, release, texture, resolution. I build sets that feel like a journey from start to finish, not just a playlist." },
-                  { label: "Mixes — Coming Soon", title: "SoundCloud / Stream", body: "Recorded sets and mixes will be embedded here via SoundCloud. Reach out directly if you want to hear something sooner." },
-                ].map((c) => (
-                  <TiltCard key={c.title} className="placeholder-card">
-                    <span className="placeholder-card-label">{c.label}</span>
-                    <h3 className="placeholder-card-title">{c.title}</h3>
-                    <p className="placeholder-card-body">{c.body}</p>
-                  </TiltCard>
-                ))}
+            <div className="music-inner">
+
+              {/* Header */}
+              <div className="music-header">
+                <div className="section-eyebrow mode-music">Music / DJ</div>
+                <ScrambleText text={"Sound as\na System."} className="section-title mode-music" />
+                {/* Animated EQ bars */}
+                <div className="music-eq-bars">
+                  {[0.6,1.0,0.4,0.9,0.5,1.0,0.7,0.3,0.85,0.55,0.95,0.45,0.75,0.6,1.0,0.35].map((h, i) => (
+                    <div
+                      key={i}
+                      className="music-eq-bar"
+                      style={{
+                        ["--bar-h" as string]: `${h * 100}%`,
+                        ["--bar-delay" as string]: `${i * 0.07}s`,
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
-              <div className="music-embed-wrapper">
-                <iframe
-                  allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
-                  height="450"
-                  style={{ width: "100%", maxWidth: "660px", overflow: "hidden", borderRadius: "10px", border: 0 }}
-                  sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
-                  src="https://embed.music.apple.com/us/playlist/my-axiom/pl.u-8aAVoV6HvRXxB1z"
-                />
+
+              {/* Body: info left, embed right */}
+              <div className="music-body">
+                <div className="music-info">
+                  {[
+                    { label: "Genre",       value: "Deep House · Minimal Techno · Ambient" },
+                    { label: "Approach",    value: "Sets built like narratives — tension, release, texture, resolution. Immersion over impact." },
+                    { label: "Influences",  value: "Four Tet · Bicep · Jon Hopkins · Floating Points · Burial" },
+                    { label: "Currently",   value: "Building sets, curating My Axiom on Apple Music" },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="music-row">
+                      <span className="music-row-label">{label}</span>
+                      <span className="music-row-value">{value}</span>
+                    </div>
+                  ))}
+                  <div className="music-tags">
+                    {["Deep House","Techno","Ambient","Atmospheric","Electronic"].map(t => (
+                      <span key={t} className="music-tag">{t}</span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="music-embed-col">
+                  <div className="music-embed-label">MY AXIOM — PLAYLIST</div>
+                  <iframe
+                    allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
+                    height="420"
+                    style={{ width: "100%", overflow: "hidden", borderRadius: "12px", border: 0 }}
+                    sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
+                    src="https://embed.music.apple.com/us/playlist/my-axiom/pl.u-8aAVoV6HvRXxB1z"
+                  />
+                </div>
               </div>
+
             </div>
           </section>
 

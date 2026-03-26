@@ -80,8 +80,8 @@ canvas {
   transition: background 0.5s ease, border-color 0.5s ease;
 }
 .navbar[data-mode="music"] {
-  background: rgba(20,8,0,0.3);
-  border-bottom-color: rgba(255,124,56,0.1);
+  background: rgba(0,8,20,0.3);
+  border-bottom-color: rgba(77,184,255,0.1);
 }
 .navbar[data-mode="climbing"] {
   background: rgba(5,15,5,0.3);
@@ -491,22 +491,7 @@ section {
   color: rgba(0, 229, 255, 0.6);
 }
 
-/* ── Music: orange/amber glow ───────────────────────────────────────── */
-.mode-music .placeholder-card:hover {
-  border-color: rgba(255, 124, 56, 0.45);
-  background: rgba(255, 124, 56, 0.04);
-}
-.mode-music .placeholder-card-title {
-  background: linear-gradient(90deg, #fff 0%, #ff7c38 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: shimmerText 3.5s ease-in-out infinite;
-  background-size: 200% auto;
-}
-.mode-music .placeholder-card-label {
-  color: rgba(255, 124, 56, 0.65);
-}
+/* ── Music: cold blue ────────────────────────────────────────────────── */
 
 /* ── Climbing: green glow ───────────────────────────────────────────── */
 .mode-climbing .placeholder-card:hover {
@@ -539,7 +524,7 @@ section {
   background-clip: text;
 }
 .mode-music .section-title {
-  background: linear-gradient(135deg, #fff 30%, #ff7c38 100%);
+  background: linear-gradient(135deg, #fff 30%, #4db8ff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -551,7 +536,7 @@ section {
   background-clip: text;
 }
 .mode-physics .section-eyebrow  { color: rgba(0, 229, 255, 0.65); }
-.mode-music .section-eyebrow    { color: rgba(255, 124, 56, 0.65); }
+.mode-music .section-eyebrow    { color: rgba(77, 184, 255, 0.65); }
 .mode-climbing .section-eyebrow { color: rgba(126, 217, 87, 0.65); }
 
 /* ─── CONTACT ───────────────────────────────────────────────────────── */
@@ -1541,12 +1526,127 @@ section {
   letter-spacing: -0.05em;
 }
 
-/* ─── MUSIC EMBED ───────────────────────────────────────────────────── */
-.music-embed-wrapper {
+/* ─── MUSIC SECTION ─────────────────────────────────────────────────── */
+.music-section {
+  min-height: 100vh;
   display: flex;
-  justify-content: center;
-  margin-top: 48px;
-  width: 100%;
+  flex-direction: column;
+}
+.music-inner {
+  position: relative;
+  z-index: 2;
+  padding: 100px clamp(24px, 6vw, 96px) 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  flex: 1;
+}
+
+/* Header */
+.music-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* EQ bars */
+.music-eq-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 36px;
+  margin-top: 8px;
+}
+.music-eq-bar {
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(to top, rgba(77,184,255,0.7), rgba(160,220,255,0.25));
+  transform-origin: bottom;
+  animation: eqPulse calc(0.55s + var(--bar-delay, 0s) * 2) ease-in-out infinite alternate;
+  height: var(--bar-h, 50%);
+}
+@keyframes eqPulse {
+  0%   { transform: scaleY(0.18); opacity: 0.45; }
+  50%  { transform: scaleY(0.7);  opacity: 0.75; }
+  100% { transform: scaleY(1);    opacity: 1;    }
+}
+
+/* Body layout */
+.music-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+@media (max-width: 860px) {
+  .music-body { grid-template-columns: 1fr; }
+}
+
+/* Info column */
+.music-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.music-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(77,184,255,0.07);
+  align-items: baseline;
+}
+.music-row:first-child { border-top: 1px solid rgba(77,184,255,0.07); }
+.music-row-label {
+  font-family: var(--font-display);
+  font-size: 0.52rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(77,184,255,0.5);
+  flex-shrink: 0;
+}
+.music-row-value {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.6;
+  font-family: var(--font-body);
+}
+.music-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 20px;
+}
+.music-tag {
+  font-family: var(--font-display);
+  font-size: 0.52rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(77,184,255,0.2);
+  color: rgba(77,184,255,0.6);
+  background: rgba(77,184,255,0.04);
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.music-tag:hover {
+  border-color: rgba(77,184,255,0.45);
+  color: rgba(160,220,255,0.9);
+  background: rgba(77,184,255,0.08);
+}
+
+/* Embed column */
+.music-embed-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.music-embed-label {
+  font-family: var(--font-display);
+  font-size: 0.5rem;
+  letter-spacing: 0.25em;
+  color: rgba(77,184,255,0.35);
+  padding-left: 2px;
 }
 
 /* ─── NOISE OVERLAY ─────────────────────────────────────────────────── */
@@ -1604,7 +1704,7 @@ section {
   z-index: -1;
 }
 .mode-physics .section-title::after  { background: #00e5ff; }
-.mode-music .section-title::after    { background: #ff7c38; }
+.mode-music .section-title::after    { background: #4db8ff; }
 .mode-climbing .section-title::after { background: #7ed957; }
 
 /* ─── CURSOR TRAIL ───────────────────────────────────────────────────── */
