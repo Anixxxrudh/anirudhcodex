@@ -564,9 +564,23 @@ export default function Page() {
             <div className="placeholder-section mode-physics">
               <div className="section-eyebrow">Physics / Space</div>
               <ScrambleText text={"The Universe,\nEngineered."} className="section-title" />
-              <div className="lab-image-wrapper">
-                <img src="/lab.jpg" alt="PVIC Research Lab" className="lab-image" />
-                <div className="lab-image-caption">Wright Center for Photovoltaics Innovation — PVIC Lab</div>
+              <div className="physics-gallery">
+                <div className="lab-image-wrapper">
+                  <img src="/lab.jpg" alt="PVIC Research Lab" className="lab-image" />
+                  <div className="lab-image-caption">Wright Center for Photovoltaics Innovation — PVIC Lab</div>
+                </div>
+                {[
+                  { caption: "Photo 2 — Drop image here" },
+                  { caption: "Photo 3 — Drop image here" },
+                  { caption: "Photo 4 — Drop image here" },
+                ].map(({ caption }) => (
+                  <div key={caption} className="lab-image-wrapper lab-image-placeholder">
+                    <div className="lab-image-empty">
+                      <span className="lab-image-empty-icon">+</span>
+                    </div>
+                    <div className="lab-image-caption">{caption}</div>
+                  </div>
+                ))}
               </div>
               <div className="placeholder-grid">
                 {[
