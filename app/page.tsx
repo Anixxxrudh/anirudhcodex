@@ -18,6 +18,8 @@ import QuotesSection   from "../components/QuotesSection"
 import CommandPalette    from "../components/CommandPalette"
 import ContextMenu       from "../components/ContextMenu"
 import CollabSection     from "../components/CollabSection"
+import CursorSystem      from "../components/CursorSystem"
+import MusicNotesCanvas  from "../components/MusicNotesCanvas"
 
 const SECTIONS = [
   { key: "home",     label: "HOME",     mode: "home"     },
@@ -322,6 +324,9 @@ export default function Page() {
       {/* Easter egg */}
       <EasterEgg />
 
+      {/* Cursor system */}
+      <CursorSystem />
+
       {/* Background canvas */}
       <BackgroundCanvas mode={mode} />
 
@@ -588,7 +593,8 @@ export default function Page() {
           </section>
 
           {/* ── MUSIC ───────────────────────────────────────────── */}
-          <section ref={musicRef} className="fade-section snap-section" data-mode="music" style={{ paddingTop: "100px", paddingBottom: "80px", position: "relative" }}>
+          <section ref={musicRef} className="fade-section snap-section" data-mode="music" style={{ paddingTop: "100px", paddingBottom: "80px", position: "relative", overflow: "hidden" }}>
+            <MusicNotesCanvas />
             <span className="section-ghost-number">04</span>
             <div className="placeholder-section mode-music">
               <div className="section-eyebrow">Music / DJ</div>

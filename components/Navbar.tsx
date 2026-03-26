@@ -1,5 +1,7 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+
+type CursorMode = "pulsar" | "lightsaber" | "spaceship" | "blackhole"
 
 type NavbarProps = {
   mode: string
@@ -17,14 +19,39 @@ const NAV_ITEMS = [
   { key: "contact",  label: "Contact"  },
 ]
 
+const CURSOR_LIST: { id: CursorMode; label: string; icon: string }[] = [
+  { id: "pulsar",     label: "Pulsar",     icon: "◉" },
+  { id: "lightsaber", label: "Lightsaber", icon: "⟡" },
+  { id: "spaceship",  label: "Spaceship",  icon: "▲" },
+  { id: "blackhole",  label: "Blackhole",  icon: "◎" },
+]
+
 export default function Navbar({ mode, setMode, scrollToSection }: NavbarProps) {
-  const [open, setOpen] = useState(false)
+  const [open,       setOpen]       = useState(false)
+  const [cursorOpen, setCursorOpen] = useState(false)
+  const [cursorMode, setCursorMode] = useState<CursorMode>("pulsar")
+
+  useEffect(() => {
+    const saved = localStorage.getItem("protocol-cursor") as CursorMode | null
+    const valid: CursorMode[] = ["pulsar", "lightsaber", "spaceship", "blackhole"]
+    if (saved && valid.includes(saved)) setCursorMode(saved)
+  }, [])
 
   const go = (key: string) => {
     setMode(key)
     scrollToSection(key)
     setOpen(false)
+    setCursorOpen(false)
   }
+
+  const selectCursor = (m: CursorMode) => {
+    setCursorMode(m)
+    localStorage.setItem("protocol-cursor", m)
+    window.dispatchEvent(new CustomEvent("cursor-change", { detail: m }))
+    setCursorOpen(false)
+  }
+
+  const currentCursor = CURSOR_LIST.find(c => c.id === cursorMode)
 
   return (
     <>
@@ -44,6 +71,35 @@ export default function Navbar({ mode, setMode, scrollToSection }: NavbarProps) 
             {label}
           </button>
         ))}
+
+        {/* Cursor picker */}
+        <div className="cursor-nav-picker">
+          <button
+            className={`cursor-nav-btn${cursorOpen ? " cursor-nav-btn--open" : ""}`}
+            onClick={() => setCursorOpen(o => !o)}
+            title="Change cursor style"
+            aria-label="Cursor picker"
+          >
+            <span className="cursor-nav-icon">{currentCursor?.icon ?? "◉"}</span>
+          </button>
+
+          {cursorOpen && (
+            <div className="cursor-nav-dropdown">
+              <div className="cursor-nav-dropdown-label">CURSOR</div>
+              {CURSOR_LIST.map((c) => (
+                <button
+                  key={c.id}
+                  className={`cursor-nav-option${cursorMode === c.id ? " active" : ""}`}
+                  onClick={() => selectCursor(c.id)}
+                >
+                  <span className="cursor-nav-option-icon">{c.icon}</span>
+                  <span className="cursor-nav-option-label">{c.label}</span>
+                  {cursorMode === c.id && <span className="cursor-nav-active-dot" />}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Mobile hamburger */}
         <button
