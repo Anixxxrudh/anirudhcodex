@@ -19,7 +19,7 @@ import CommandPalette    from "../components/CommandPalette"
 import ContextMenu       from "../components/ContextMenu"
 import CollabSection     from "../components/CollabSection"
 import CursorSystem      from "../components/CursorSystem"
-import MusicNotesCanvas  from "../components/MusicNotesCanvas"
+import MusicBackgroundCanvas from "../components/MusicBackgroundCanvas"
 
 const SECTIONS = [
   { key: "home",     label: "HOME",     mode: "home"     },
@@ -594,7 +594,7 @@ export default function Page() {
 
           {/* ── MUSIC ───────────────────────────────────────────── */}
           <section ref={musicRef} className="fade-section snap-section music-section" data-mode="music" style={{ position: "relative", overflow: "hidden" }}>
-            <MusicNotesCanvas />
+            <MusicBackgroundCanvas />
             <span className="section-ghost-number">04</span>
             <div className="music-inner">
 
