@@ -2381,12 +2381,136 @@ section {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  transition: border-color 0.3s, background 0.3s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
+}
+.project-card-h::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: linear-gradient(120deg, rgba(100,180,255,0.06) 0%, rgba(255,255,255,0.03) 50%, rgba(100,180,255,0.06) 100%);
+  background-size: 200% 100%;
+  opacity: 0;
+  transition: opacity 0.35s ease, background-position 0.6s ease;
 }
 .project-card-h:hover {
-  border-color: rgba(77,184,255,0.35);
-  background: rgba(77,184,255,0.04);
+  border-color: rgba(100,180,255,0.4);
+  background: rgba(100,180,255,0.03);
+  box-shadow: 0 0 18px rgba(100,180,255,0.25);
 }
+.project-card-h:hover::before {
+  opacity: 1;
+  background-position: 100% 0;
+}
+.project-card-h--open {
+  border-color: rgba(100,180,255,0.55);
+  background: rgba(100,180,255,0.05);
+  box-shadow: 0 0 28px rgba(100,180,255,0.3);
+}
+
+/* top row: index + icon */
+.pcard-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pcard-icon {
+  font-size: 1.1rem;
+  color: rgba(100,180,255,0.35);
+  line-height: 1;
+  user-select: none;
+}
+.pcard-subtitle {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.32);
+  font-family: var(--font-body);
+  margin: -4px 0 0;
+}
+
+/* expandable body */
+.pcard-expanded {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.project-card-h--open .pcard-expanded {
+  max-height: 1200px;
+}
+.pcard-section { display: flex; flex-direction: column; gap: 6px; }
+.pcard-section-heading {
+  font-size: 0.55rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(100,180,255,0.6);
+  font-family: var(--font-display);
+  margin-bottom: 2px;
+}
+.pcard-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pcard-list li {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.6);
+  padding-left: 14px;
+  position: relative;
+  line-height: 1.5;
+}
+.pcard-list li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: rgba(100,180,255,0.4);
+  font-size: 0.65rem;
+}
+
+/* badges */
+.pcard-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 4px;
+}
+.pcard-badge {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(100,180,255,0.12);
+  border: 1px solid rgba(100,180,255,0.25);
+  color: rgba(255,255,255,0.75);
+  font-family: var(--font-body);
+  transition: background 0.2s;
+}
+
+/* toggle indicator */
+.pcard-toggle {
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(100,180,255,0.45);
+  font-family: var(--font-display);
+  margin-top: 4px;
+  transition: color 0.25s;
+}
+.project-card-h:hover .pcard-toggle,
+.project-card-h--open .pcard-toggle {
+  color: rgba(100,180,255,0.8);
+}
+
 @media (max-width: 768px) {
   .projects-grid { grid-template-columns: 1fr; }
 }

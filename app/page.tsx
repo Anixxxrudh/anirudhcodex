@@ -17,10 +17,7 @@ import TiltCard        from "../components/TiltCard"
 import QuotesSection   from "../components/QuotesSection"
 import CommandPalette    from "../components/CommandPalette"
 import ContextMenu       from "../components/ContextMenu"
-import CursorSystem      from "../components/CursorSystem"
 import CollabSection     from "../components/CollabSection"
-import WeatherWidget     from "../components/WeatherWidget"
-import ShareButton       from "../components/ShareButton"
 
 const SECTIONS = [
   { key: "home",     label: "HOME",     mode: "home"     },
@@ -57,6 +54,7 @@ export default function Page() {
   const [cmdOpen,       setCmdOpen]       = useState(false)
   const [kbTooltip,     setKbTooltip]     = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [expandedCard,  setExpandedCard]  = useState<string | null>(null)
 
   const transitioning = useRef(false)
 
@@ -324,9 +322,6 @@ export default function Page() {
       {/* Easter egg */}
       <EasterEgg />
 
-      {/* Cursor system */}
-      <CursorSystem />
-
       {/* Background canvas */}
       <BackgroundCanvas mode={mode} />
 
@@ -353,12 +348,6 @@ export default function Page() {
 
       {/* Context menu */}
       <ContextMenu scrollToSection={scrollToSection} />
-
-      {/* Weather widget */}
-      <WeatherWidget />
-
-      {/* Share button */}
-      <ShareButton />
 
       {/* Section indicator dots */}
       <div className="section-dots">
@@ -404,8 +393,14 @@ export default function Page() {
               </p>
               <div className="crawl-wrapper">
                 <div className={`crawl-inner${loaded ? "" : " crawl-paused"}`}>
-                  <p>From solar cells to distant galaxies, from sound waves to mountain walls —</p>
-                  <p>this is where science, creativity, and motion converge.</p>
+                  <p>A long time ago, in a lab not so far away...</p>
+                  <p>EPISODE II — THE ANIRUDH PROTOCOL</p>
+                  <p>Sophomore physicist at the University of Toledo, charting a course through thin-film solar cells and the expanding universe.</p>
+                  <p>At the Wright Center for Photovoltaics (PVIC), our hero engineers CdTe/CdSeTe devices — pushing back-interface recombination to the outer rim using SWCNT networks and ALD-deposited Al₂O₃ interlayers.</p>
+                  <p>By day: sputtering, ALD, JV curves, EQE spectra, Python pipelines. By night: deep house mixes, climbing walls, and staring at the dark energy driving the universe apart.</p>
+                  <p>As President of the Wilderness Exploration Club, he leads expeditions into Cuyahoga Valley, the Smoky Mountains, and beyond — 20 to 30 rebels at a time.</p>
+                  <p>Physics track. Astrophysics focus. Data Science minor. Hackathon logistics commander. Portfolio architect.</p>
+                  <p>From solar cells to distant galaxies — from sound waves to mountain walls — this is where science, creativity, and motion converge.</p>
                   <p>This is The Anirudh Protocol.</p>
                 </div>
               </div>
@@ -472,42 +467,95 @@ export default function Page() {
               <h2 className="section-title">Selected Work</h2>
             </div>
             <div className="projects-grid">
-              {[
+              {([
                 {
-                  idx: "01", title: "CdTe Solar Cell Interface Optimization",
-                  desc: "Investigating back-interface recombination in CdTe/CdSeTe photovoltaic devices using SWCNT networks and ALD-deposited Al₂O₃ interlayers. Full fabrication and characterization pipeline handled in-house at PVIC.",
+                  idx: "01", icon: "⚛", title: "Photovoltaics Research — CdTe Solar Cells",
+                  subtitle: "Thin-Film Solar Innovation @ University of Toledo (PVIC)",
+                  collapsedDesc: "Engineering the back interface of CdTe thin-film solar cells to reduce recombination losses and push efficiency limits at the Wright Center for Photovoltaics (PVIC).",
                   role: "Researcher — Fabrication, Characterization, Analysis",
-                  impact: "Advancing interface engineering for next-generation thin-film solar efficiency",
+                  impact: "Advancing next-generation thin-film solar efficiency",
+                  sections: [
+                    { heading: "RESEARCH FOCUS", items: ["Interface engineering for CdTe solar cells", "Improving Voc and fill factor", "Reducing back contact recombination losses"] },
+                    { heading: "TECHNIQUES & TOOLS", items: ["ALD deposition (Al₂O₃)", "Sputtering (ZnTe:Cu)", "SWCNT networks", "JV & EQE characterization", "UV-Vis spectroscopy", "JMP, IGOR Pro, Python"] },
+                    { heading: "KEY CONTRIBUTIONS", items: ["Integrated SWCNT networks with ALD Al₂O₃ interlayers", "Investigated interface passivation strategies", "Built and ran full fabrication + characterization pipeline", "Worked in cleanroom, vacuum systems, thin-film deposition rigs"] },
+                    { heading: "IMPACT", items: ["Driving improvements toward higher efficiency solar cells and scalable renewable energy solutions."] },
+                  ],
+                  badges: ["Research", "Clean Energy", "Nanotechnology", "Thin Films"],
                 },
                 {
-                  idx: "02", title: "RocketHacks — Event Logistics System",
-                  desc: "End-to-end logistics design and execution for a 24-hour university hackathon. Coordinated participant flow, scheduling, sponsor engagement, and real-time operations across a large, multi-track event.",
+                  idx: "02", icon: "◈", title: "RocketHacks — Event Logistics System",
+                  subtitle: "University Hackathon Operations",
+                  collapsedDesc: "End-to-end logistics design and execution for a 24-hour university hackathon. Coordinated participant flow, scheduling, sponsor engagement, and real-time operations across a large, multi-track event.",
                   role: "Event Logistics Lead",
                   impact: "Seamless experience delivered across hundreds of participants",
+                  sections: [
+                    { heading: "RESPONSIBILITIES", items: ["Designed and executed full event logistics for 24-hour hackathon", "Managed participant flow, track scheduling, and venue operations", "Coordinated sponsor engagement and real-time communications", "Led a team of volunteers across multiple event tracks"] },
+                    { heading: "IMPACT", items: ["Delivered a smooth, high-energy experience for hundreds of student participants across the University of Toledo."] },
+                  ],
+                  badges: ["Leadership", "Events", "Operations", "Teamwork"],
                 },
                 {
-                  idx: "03", title: "Cinematic Portfolio Website",
-                  desc: "A visually immersive personal portfolio featuring animated star-field backgrounds, scroll-driven section transitions, Star Wars perspective crawl, and a dynamic canvas that responds to each section's identity.",
+                  idx: "03", icon: "◈", title: "Cinematic Portfolio Website",
+                  subtitle: "Personal Brand & Digital Identity",
+                  collapsedDesc: "A visually immersive personal portfolio featuring animated star-field backgrounds, scroll-driven section transitions, Star Wars perspective crawl, and a dynamic canvas that responds to each section's identity.",
                   role: "Creator / Designer — AI-assisted development",
                   impact: "Personal brand expressed through design, motion, and technology",
+                  sections: [
+                    { heading: "FEATURES", items: ["Animated star-field & section-reactive canvas backgrounds", "Snap-scroll with wormhole transition animation", "Star Wars perspective crawl on the home screen", "Command palette (⌘K) and keyboard navigation", "Expandable project cards with CSS transitions"] },
+                    { heading: "STACK", items: ["Next.js 15 (App Router)", "React 19", "TypeScript", "Pure CSS animations — no animation libraries"] },
+                  ],
+                  badges: ["Design", "React", "Next.js", "CSS"],
                 },
                 {
-                  idx: "04", title: "Photovoltaics Research Portfolio",
-                  desc: "A deeper look into my work at the Wright Center for Photovoltaics, including device fabrication, JV and EQE characterization, and interface engineering techniques using carbon nanotubes and ALD-deposited aluminum oxide.",
-                  role: "Researcher — PVIC, University of Toledo",
-                  impact: "Hands-on experience in advanced solar cell research and performance optimization",
+                  idx: "04", icon: "▲", title: "WEX — Wilderness Exploration Club",
+                  subtitle: "President | Outdoor Leadership & Expedition Planning",
+                  collapsedDesc: "Leading the Wilderness Exploration Club at the University of Toledo — organizing multi-day expeditions, managing logistics for 20–30+ participants, and building a thriving outdoor community on campus.",
+                  role: "President — WEX, University of Toledo",
+                  impact: "Creating accessible outdoor experiences that build resilience and real connection",
+                  sections: [
+                    { heading: "RESPONSIBILITIES", items: ["Planned and led multi-day trips (camping, hiking, climbing)", "Organized large-scale group logistics (20–30+ participants)", "Managed budgeting, SAC funding, and trip coordination", "Built and grew the outdoor community on campus"] },
+                    { heading: "EXPEDITIONS ORGANIZED", items: ["Cuyahoga Valley National Park (camping + hiking)", "Snow Trails skiing & snowboarding trips", "Campus climbing gym events", "Smoky Mountains multi-day expedition"] },
+                    { heading: "SKILLS DEVELOPED", items: ["Leadership & team coordination", "Logistics & operations planning", "Risk management in outdoor environments"] },
+                    { heading: "IMPACT", items: ["Created accessible outdoor experiences and helped students disconnect, explore nature, and build genuine connections beyond campus life."] },
+                  ],
+                  badges: ["Leadership", "Outdoors", "Expeditions", "Community"],
                 },
-              ].map((p) => (
-                <div key={p.idx} className="project-card-h">
-                  <span className="project-index">{p.idx}</span>
-                  <h3 className="project-title">{p.title}</h3>
-                  <p className="project-desc">{p.desc}</p>
-                  <div className="project-footer">
-                    <span className="project-role">{p.role}</span>
-                    <span className="project-impact">{p.impact}</span>
+              ] as const).map((p) => {
+                const isOpen = expandedCard === p.idx
+                return (
+                  <div
+                    key={p.idx}
+                    className={`project-card-h${isOpen ? " project-card-h--open" : ""}`}
+                    onClick={() => setExpandedCard(isOpen ? null : p.idx)}
+                  >
+                    <div className="pcard-top">
+                      <span className="project-index">{p.idx}</span>
+                      <span className="pcard-icon">{p.icon}</span>
+                    </div>
+                    <h3 className="project-title">{p.title}</h3>
+                    <p className="pcard-subtitle">{p.subtitle}</p>
+                    <p className="project-desc">{p.collapsedDesc}</p>
+                    <div className="project-footer">
+                      <span className="project-role">{p.role}</span>
+                      <span className="project-impact">{p.impact}</span>
+                    </div>
+                    <div className="pcard-expanded">
+                      {p.sections.map((s) => (
+                        <div key={s.heading} className="pcard-section">
+                          <p className="pcard-section-heading">{s.heading}</p>
+                          <ul className="pcard-list">
+                            {s.items.map((item) => <li key={item}>{item}</li>)}
+                          </ul>
+                        </div>
+                      ))}
+                      <div className="pcard-badges">
+                        {p.badges.map((b) => <span key={b} className="pcard-badge">{b}</span>)}
+                      </div>
+                    </div>
+                    <div className="pcard-toggle">{isOpen ? "↑ Close" : "↓ Details"}</div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </section>
 
