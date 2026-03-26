@@ -5,7 +5,6 @@ import BackgroundCanvas from "../components/BackgroundCanvas"
 import Navbar from "../components/Navbar"
 import LoadingScreen from "../components/LoadingScreen"
 import Timeline from "../components/Timeline"
-import NowSection from "../components/NowSection"
 import SkillsSection from "../components/SkillsSection"
 import EasterEgg from "../components/EasterEgg"
 import HeroCanvas      from "../components/HeroCanvas"
@@ -15,7 +14,6 @@ import BlogSection     from "../components/BlogSection"
 import ContactForm     from "../components/ContactForm"
 import ScrambleText    from "../components/ScrambleText"
 import TiltCard        from "../components/TiltCard"
-import CounterSection  from "../components/CounterSection"
 import QuotesSection   from "../components/QuotesSection"
 import CommandPalette    from "../components/CommandPalette"
 import ContextMenu       from "../components/ContextMenu"
@@ -27,13 +25,11 @@ import ShareButton       from "../components/ShareButton"
 const SECTIONS = [
   { key: "home",     label: "HOME",     mode: "home"     },
   { key: "about",    label: "ABOUT",    mode: "about"    },
-  { key: "counters", label: "STATS",    mode: "about"    },
   { key: "projects", label: "PROJECTS", mode: "projects" },
   { key: "physics",  label: "PHYSICS",  mode: "physics"  },
   { key: "music",    label: "MUSIC",    mode: "music"    },
   { key: "climbing", label: "CLIMBING", mode: "climbing" },
   { key: "timeline", label: "TIMELINE", mode: "home"     },
-  { key: "now",      label: "NOW",      mode: "home"     },
   { key: "skills",   label: "SKILLS",   mode: "physics"  },
   { key: "blog",     label: "WRITING",  mode: "about"    },
   { key: "collab",   label: "COLLAB",   mode: "about"    },
@@ -73,14 +69,11 @@ export default function Page() {
   // Section refs
   const homeRef     = useRef<HTMLElement>(null)
   const aboutRef    = useRef<HTMLElement>(null)
-  const countersRef = useRef<HTMLDivElement>(null)
   const projectsRef = useRef<HTMLElement>(null)
-  const projectsTrackRef = useRef<HTMLDivElement>(null)
   const physicsRef  = useRef<HTMLElement>(null)
   const musicRef    = useRef<HTMLElement>(null)
   const climbingRef = useRef<HTMLElement>(null)
   const timelineRef = useRef<HTMLDivElement>(null)
-  const nowRef      = useRef<HTMLDivElement>(null)
   const skillsRef   = useRef<HTMLDivElement>(null)
   const blogRef     = useRef<HTMLDivElement>(null)
   const collabRef   = useRef<HTMLDivElement>(null)
@@ -95,13 +88,11 @@ export default function Page() {
     const map = {
       home:     homeRef,
       about:    aboutRef,
-      counters: countersRef,
       projects: projectsRef,
       physics:  physicsRef,
       music:    musicRef,
       climbing: climbingRef,
       timeline: timelineRef,
-      now:      nowRef,
       skills:   skillsRef,
       blog:     blogRef,
       collab:   collabRef,
@@ -240,21 +231,6 @@ export default function Page() {
     return () => obs.disconnect()
   }, [])
 
-  // ─── PROJECTS HORIZONTAL WHEEL HIJACK ────────────────────────────
-  useEffect(() => {
-    const section = projectsRef.current
-    const track = projectsTrackRef.current
-    if (!section || !track) return
-    const projectsIdx = SECTIONS.findIndex(s => s.key === "projects")
-    const onWheel = (e: WheelEvent) => {
-      if (activeSectionRef.current !== projectsIdx) return
-      e.preventDefault()
-      track.scrollLeft += e.deltaY * 1.2
-    }
-    section.addEventListener("wheel", onWheel, { passive: false })
-    return () => section.removeEventListener("wheel", onWheel)
-  }, [])
-
   // ─── COMMAND PALETTE (⌘K / Ctrl+K) ───────────────────────────────
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -269,7 +245,7 @@ export default function Page() {
 
   // ─── KEYBOARD NAVIGATION ─────────────────────────────────────────
   useEffect(() => {
-    const KEYS = ["home","about","counters","projects","physics","music","climbing","timeline","now","skills","blog","collab","quotes","contact"]
+    const KEYS = ["home","about","projects","physics","music","climbing","timeline","skills","blog","collab","quotes","contact"]
     let gPressed = false
     let gTimer: ReturnType<typeof setTimeout> | null = null
     let kbShownRef = false
@@ -454,24 +430,15 @@ export default function Page() {
               {/* Right: content */}
               <div className="about-split-content">
                 <div className="section-eyebrow">About</div>
-                <ScrambleText text={"Physicist.\nResearcher.\nBuilder."} className="section-title" />
+                <h2 className="section-title">Physicist.<br />Researcher.<br />Builder.</h2>
                 <p className="about-lead">
-                  Sophomore at the University of Toledo, majoring in Physics with
-                  an astrophysics focus and a minor in Data Science. I research
-                  thin-film solar cells at PVIC and lead the Wilderness Exploration Club.
+                  Sophomore at the University of Toledo — Physics (Astrophysics track), minor in Data Science.
+                  Researcher at the Wright Center for Photovoltaics (PVIC) and President of the Wilderness Exploration Club.
                 </p>
                 <p className="about-body">
-                  My work sits at the intersection of fundamental physics and applied engineering.
-                  At PVIC, I focus on improving CdTe/CdSeTe solar device efficiency through interface
-                  engineering — using single-walled carbon nanotube networks and ALD-deposited
-                  aluminum oxide to reduce back-interface recombination. I work hands-on with device
-                  fabrication, sputtering, ALD, gold deposition, and characterization via JV and EQE
-                  measurements, with analysis pipelines in Python, JMP, and IGOR.
-                </p>
-                <p className="about-body">
-                  Outside the lab, I organize large-scale outdoor expeditions and contribute to
-                  events like RocketHacks. I believe the best work happens when curiosity, craft,
-                  and collaboration converge.
+                  At PVIC, I engineer CdTe/CdSeTe thin-film solar devices — focusing on back-interface recombination
+                  reduction via SWCNT networks and ALD-deposited Al₂O₃. Full fabrication and characterization pipeline:
+                  sputtering, ALD, gold deposition, JV/EQE analysis in Python, JMP, and IGOR.
                 </p>
                 <div className="about-tags">
                   {["Device Fabrication","ALD","Sputtering","JV / EQE","Python","JMP","IGOR","Data Science","CdTe/CdSeTe"].map((t) => (
@@ -497,20 +464,14 @@ export default function Page() {
             </div>
           </section>
 
-          {/* ── COUNTERS ────────────────────────────────────────── */}
-          <div ref={countersRef} className="snap-section">
-            <CounterSection />
-          </div>
-
-          {/* ── PROJECTS (horizontal scroll) ─────────────────────── */}
-          <section ref={projectsRef} className="projects-horizontal fade-section snap-section" data-mode="projects" style={{ position: "relative" }}>
+          {/* ── PROJECTS ─────────────────────────────────────────── */}
+          <section ref={projectsRef} className="projects-grid-section fade-section snap-section" data-mode="projects" style={{ position: "relative" }}>
             <span className="section-ghost-number">02</span>
-            <div className="projects-horizontal-header">
+            <div className="projects-grid-header">
               <div className="section-eyebrow">Projects</div>
-              <ScrambleText text="Selected Work" className="section-title" />
+              <h2 className="section-title">Selected Work</h2>
             </div>
-            <div className="projects-scroll-hint">SCROLL TO EXPLORE</div>
-            <div className="projects-scroll-track" ref={projectsTrackRef}>
+            <div className="projects-grid">
               {[
                 {
                   idx: "01", title: "CdTe Solar Cell Interface Optimization",
@@ -635,12 +596,6 @@ export default function Page() {
           <div className="snap-section" ref={timelineRef} style={{ position: "relative" }}>
             <span className="section-ghost-number">06</span>
             <Timeline />
-          </div>
-
-          {/* ── NOW ─────────────────────────────────────────────── */}
-          <div className="snap-section" ref={nowRef} style={{ position: "relative" }}>
-            <span className="section-ghost-number">07</span>
-            <NowSection />
           </div>
 
           {/* ── SKILLS ──────────────────────────────────────────── */}

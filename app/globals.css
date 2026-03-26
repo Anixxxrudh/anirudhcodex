@@ -2334,11 +2334,11 @@ section {
   pointer-events: none;
 }
 .about-split-content {
-  padding: clamp(80px, 10vh, 120px) clamp(32px, 5vw, 72px);
+  padding: clamp(60px, 8vh, 100px) clamp(32px, 5vw, 72px);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 20px;
+  gap: 16px;
   overflow-y: auto;
 }
 @media (max-width: 768px) {
@@ -2355,69 +2355,40 @@ section {
   }
 }
 
-/* ─── HORIZONTAL SCROLL PROJECTS ─────────────────────────────────────── */
-.projects-horizontal {
+/* ─── GRID PROJECTS ───────────────────────────────────────────────────── */
+.projects-grid-section {
   min-height: 100vh;
-  padding-top: 100px;
-  padding-bottom: 40px;
+  padding: 100px clamp(24px, 6vw, 96px) 60px;
   display: flex;
   flex-direction: column;
   position: relative;
   z-index: 2;
 }
-.projects-scroll-track {
-  display: flex;
+.projects-grid-header {
+  margin-bottom: 32px;
+}
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 24px clamp(24px, 6vw, 96px) 40px;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
   flex: 1;
 }
-.projects-scroll-track::-webkit-scrollbar {
-  display: none;
-}
 .project-card-h {
-  min-width: clamp(280px, 35vw, 380px);
-  scroll-snap-align: start;
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 32px;
+  padding: 28px;
   background: rgba(255,255,255,0.02);
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  flex-shrink: 0;
+  gap: 12px;
   transition: border-color 0.3s, background 0.3s;
 }
 .project-card-h:hover {
   border-color: rgba(77,184,255,0.35);
   background: rgba(77,184,255,0.04);
 }
-.projects-scroll-hint {
-  font-family: var(--font-display);
-  font-size: 0.5rem;
-  letter-spacing: 0.25em;
-  color: rgba(255,255,255,0.2);
-  padding: 0 clamp(24px, 6vw, 96px);
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.projects-scroll-hint::after {
-  content: '→';
-  animation: nudgeRight 1.5s ease-in-out infinite;
-}
-@keyframes nudgeRight {
-  0%, 100% { transform: translateX(0); opacity: 0.3; }
-  50%       { transform: translateX(6px); opacity: 0.8; }
-}
-.projects-horizontal-header {
-  padding: 0 clamp(24px, 6vw, 96px);
-  margin-bottom: 8px;
+@media (max-width: 768px) {
+  .projects-grid { grid-template-columns: 1fr; }
 }
 
 /* ─── SECTION GHOST NUMBERS ──────────────────────────────────────────── */
