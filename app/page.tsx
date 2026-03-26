@@ -645,7 +645,7 @@ export default function Page() {
                     height="420"
                     style={{ width: "100%", overflow: "hidden", borderRadius: "12px", border: 0 }}
                     sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
-                    src="https://embed.music.apple.com/us/playlist/my-axiom/pl.u-8aAVoV6HvRXxB1z"
+                    src="https://embed.music.apple.com/us/playlist/my-axiom/pl.u-8aAVoV6HvRXxB1z?theme=dark"
                   />
                 </div>
               </div>

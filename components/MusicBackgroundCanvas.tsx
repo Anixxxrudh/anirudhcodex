@@ -1,8 +1,6 @@
 "use client"
 import { useEffect, useRef } from "react"
 
-interface Star { x: number; y: number; r: number; a: number }
-
 export default function MusicBackgroundCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -11,13 +9,11 @@ export default function MusicBackgroundCanvas() {
     if (!canvas) return
     const ctx = canvas.getContext("2d")!
 
-    // Pre-computed stars (once on mount, stored in closure)
-    let stars: Star[] = []
     let animId: number
     let vinylAngle = 0
     let waveRingAngle = 0
 
-    // Ripple ring state
+    // Ripple ring state — 5 rings expanding from center
     const RIPPLE_COUNT = 5
     const ripples = Array.from({ length: RIPPLE_COUNT }, (_, i) => ({
       r: 40 + (i / RIPPLE_COUNT) * 460,
@@ -27,139 +23,161 @@ export default function MusicBackgroundCanvas() {
 
     // Sine wave phases
     const waves = [
-      { amp: 20, freq: 0.008, phase: 0, speed: 0.02,  opacity: 0.12, lw: 1.5 },
-      { amp: 35, freq: 0.005, phase: 2, speed: 0.015, opacity: 0.07, lw: 1.0 },
-      { amp: 15, freq: 0.012, phase: 4, speed: 0.025, opacity: 0.09, lw: 1.0 },
+      { amp: 20, freq: 0.008, phase: 0,  speed: 0.02,  opacity: 0.10, lw: 1.5 },
+      { amp: 35, freq: 0.005, phase: 2,  speed: 0.015, opacity: 0.06, lw: 1.0 },
+      { amp: 15, freq: 0.012, phase: 4,  speed: 0.025, opacity: 0.08, lw: 1.0 },
     ]
-
-    const buildStars = (cx: number, cy: number, diskR: number) => {
-      stars = []
-      for (let i = 0; i < 380; i++) {
-        // Random point inside circle
-        const angle = Math.random() * Math.PI * 2
-        const dist  = Math.sqrt(Math.random()) * diskR * 0.96
-        stars.push({
-          x: cx + Math.cos(angle) * dist,
-          y: cy + Math.sin(angle) * dist,
-          r: 0.5 + Math.random() * 1.0,
-          a: 0.3 + Math.random() * 0.5,
-        })
-      }
-    }
 
     const resize = () => {
       canvas.width  = canvas.offsetWidth
       canvas.height = canvas.offsetHeight
-      const cx = canvas.width / 2
-      const cy = canvas.height / 2
-      const diskR = Math.min(canvas.width, canvas.height) * 0.35
-      buildStars(cx, cy, diskR)
     }
 
     const draw = (now: number) => {
-      const W = canvas.width
-      const H = canvas.height
+      const W  = canvas.width
+      const H  = canvas.height
       const cx = W / 2
       const cy = H / 2
-      const diskR = Math.min(W, H) * 0.35
+      // Vinyl radius: fits comfortably in the section
+      const R  = Math.min(W, H) * 0.36
 
       ctx.clearRect(0, 0, W, H)
 
-      // ── LAYER 4: RIPPLE RINGS (draw behind vinyl) ─────────────────────
+      // ── RIPPLE RINGS (behind vinyl) ──────────────────────────────────
       for (const rp of ripples) {
-        rp.r += 0.7
+        rp.r += 0.6
         if (rp.r > rp.maxR) rp.r = rp.minR
-        const t = (rp.r - rp.minR) / (rp.maxR - rp.minR)
-        const op = 0.15 * (1 - t)
+        const t  = (rp.r - rp.minR) / (rp.maxR - rp.minR)
+        const op = 0.13 * (1 - t)
         ctx.beginPath()
         ctx.arc(cx, cy, rp.r, 0, Math.PI * 2)
         ctx.strokeStyle = `rgba(77,184,255,${op})`
-        ctx.lineWidth = 0.8
+        ctx.lineWidth   = 0.8
         ctx.stroke()
       }
 
-      // ── LAYER 1: MILKY WAY VINYL RECORD ──────────────────────────────
-      vinylAngle += (Math.PI * 2) / (18 * 60) // 18s per rotation at 60fps
+      // ── VINYL RECORD ─────────────────────────────────────────────────
+      vinylAngle += (Math.PI * 2) / (20 * 60) // 20-second rotation
 
       ctx.save()
       ctx.translate(cx, cy)
       ctx.rotate(vinylAngle)
-      ctx.globalAlpha = 0.55
 
-      // Disk fill — radial gradient (galactic core)
-      const diskGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, diskR)
-      diskGrad.addColorStop(0,    "rgba(180,210,255,0.15)")
-      diskGrad.addColorStop(0.35, "rgba(77,184,255,0.09)")
-      diskGrad.addColorStop(0.7,  "rgba(77,184,255,0.04)")
-      diskGrad.addColorStop(1,    "rgba(0,0,0,0)")
+      // 1. Dark vinyl playing surface
+      const diskGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, R)
+      diskGrad.addColorStop(0,    "rgba(18,22,32,0.0)")   // transparent center → label area handles this
+      diskGrad.addColorStop(0.30, "rgba(14,18,26,0.92)")  // label-to-groove transition
+      diskGrad.addColorStop(0.55, "rgba(10,13,20,0.97)")  // mid grooves
+      diskGrad.addColorStop(0.85, "rgba(7,10,16,1.0)")    // outer grooves
+      diskGrad.addColorStop(1,    "rgba(4,7,12,0.85)")    // edge fades slightly
       ctx.beginPath()
-      ctx.arc(0, 0, diskR, 0, Math.PI * 2)
+      ctx.arc(0, 0, R, 0, Math.PI * 2)
       ctx.fillStyle = diskGrad
       ctx.fill()
 
-      // Vinyl groove rings
-      const GROOVE_COUNT = 52
-      for (let i = 1; i <= GROOVE_COUNT; i++) {
-        const gr = (i / GROOVE_COUNT) * diskR * 0.96
-        const op = i % 2 === 0 ? 0.08 : 0.04
+      // 2. Groove rings (fine, concentric) — only over playing surface
+      const GROOVE_START = Math.floor(R * 0.30)
+      const GROOVE_END   = Math.floor(R * 0.95)
+      const GROOVE_COUNT = 64
+      for (let i = 0; i < GROOVE_COUNT; i++) {
+        const t  = i / GROOVE_COUNT
+        const gr = GROOVE_START + t * (GROOVE_END - GROOVE_START)
+        // Alternate subtle/slightly-less-subtle for a micro-groove look
+        const op = i % 3 === 0 ? 0.07 : 0.03
         ctx.beginPath()
         ctx.arc(0, 0, gr, 0, Math.PI * 2)
         ctx.strokeStyle = `rgba(77,184,255,${op})`
-        ctx.lineWidth = 0.6
+        ctx.lineWidth   = 0.5
         ctx.stroke()
       }
 
-      // Stars scattered across disk (pre-computed, draw in rotated space)
-      for (const s of stars) {
-        // Stars are in world space; compensate rotation so they rotate with vinyl
-        const cosA = Math.cos(-vinylAngle)
-        const sinA = Math.sin(-vinylAngle)
-        const lx = s.x - cx
-        const ly = s.y - cy
-        const rx = lx * cosA - ly * sinA
-        const ry = lx * sinA + ly * cosA
-        ctx.beginPath()
-        ctx.arc(rx, ry, s.r, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(255,255,255,${s.a})`
-        ctx.fill()
-      }
+      // 3. Outer label area (dark, distinct)
+      const labelR = R * 0.29
+      const labelGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, labelR)
+      labelGrad.addColorStop(0,    "rgba(8,14,28,1.0)")
+      labelGrad.addColorStop(0.55, "rgba(12,20,38,1.0)")
+      labelGrad.addColorStop(0.85, "rgba(18,28,50,1.0)")
+      labelGrad.addColorStop(1,    "rgba(20,32,56,1.0)")
+      ctx.beginPath()
+      ctx.arc(0, 0, labelR, 0, Math.PI * 2)
+      ctx.fillStyle = labelGrad
+      ctx.fill()
 
-      // Center hole
-      const holeGlow = ctx.createRadialGradient(0, 0, 0, 0, 0, 18)
-      holeGlow.addColorStop(0,   "rgba(220,240,255,0.9)")
-      holeGlow.addColorStop(0.4, "rgba(180,220,255,0.6)")
-      holeGlow.addColorStop(1,   "rgba(77,184,255,0)")
-      ctx.beginPath(); ctx.arc(0, 0, 18, 0, Math.PI * 2)
-      ctx.fillStyle = holeGlow; ctx.fill()
-      ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI * 2)
-      ctx.fillStyle = "rgba(220,240,255,0.85)"; ctx.fill()
+      // Label edge ring
+      ctx.beginPath()
+      ctx.arc(0, 0, labelR, 0, Math.PI * 2)
+      ctx.strokeStyle = "rgba(77,184,255,0.20)"
+      ctx.lineWidth   = 0.8
+      ctx.stroke()
 
-      ctx.globalAlpha = 1
+      // Label inner ring detail
+      ctx.beginPath()
+      ctx.arc(0, 0, labelR * 0.65, 0, Math.PI * 2)
+      ctx.strokeStyle = "rgba(77,184,255,0.08)"
+      ctx.lineWidth   = 0.5
+      ctx.stroke()
+
+      // 4. Specular highlight — arc of soft light
+      ctx.save()
+      const specGrad = ctx.createLinearGradient(-R * 0.5, -R * 0.7, R * 0.1, -R * 0.1)
+      specGrad.addColorStop(0,   "rgba(180,220,255,0.0)")
+      specGrad.addColorStop(0.3, "rgba(180,220,255,0.035)")
+      specGrad.addColorStop(0.6, "rgba(255,255,255,0.018)")
+      specGrad.addColorStop(1,   "rgba(180,220,255,0.0)")
+      ctx.beginPath()
+      ctx.arc(0, 0, R, 0, Math.PI * 2)
+      ctx.fillStyle = specGrad
+      ctx.fill()
       ctx.restore()
 
-      // ── LAYER 3: BREATHING WAVEFORM RING ─────────────────────────────
-      waveRingAngle -= 0.003 // counter-clockwise, slower
-      const ringBaseR = diskR * 1.18
-      const POINTS = 180
+      // 5. Outer rim
+      ctx.beginPath()
+      ctx.arc(0, 0, R, 0, Math.PI * 2)
+      ctx.strokeStyle = "rgba(77,184,255,0.12)"
+      ctx.lineWidth   = 1
+      ctx.stroke()
+
+      // 6. Center spindle hole
+      const holeR = R * 0.028
+      const holeGlow = ctx.createRadialGradient(0, 0, 0, 0, 0, holeR * 3)
+      holeGlow.addColorStop(0,   "rgba(200,230,255,0.9)")
+      holeGlow.addColorStop(0.4, "rgba(120,190,255,0.5)")
+      holeGlow.addColorStop(1,   "rgba(77,184,255,0.0)")
+      ctx.beginPath()
+      ctx.arc(0, 0, holeR * 3, 0, Math.PI * 2)
+      ctx.fillStyle = holeGlow
+      ctx.fill()
+      // Hard hole punch
+      ctx.beginPath()
+      ctx.arc(0, 0, holeR, 0, Math.PI * 2)
+      ctx.fillStyle = "rgba(200,230,255,0.9)"
+      ctx.fill()
+
+      ctx.restore()
+
+      // ── BREATHING WAVEFORM RING ──────────────────────────────────────
+      waveRingAngle -= 0.003
+      const ringBaseR = R * 1.18
+      const POINTS    = 180
       ctx.save()
       ctx.translate(cx, cy)
       ctx.rotate(waveRingAngle)
       ctx.beginPath()
       for (let i = 0; i <= POINTS; i++) {
-        const a = (i / POINTS) * Math.PI * 2
+        const a            = (i / POINTS) * Math.PI * 2
         const displacement = 8 + 12 * Math.sin(a * 6 + now * 0.001) * Math.cos(a * 3 + now * 0.0007)
-        const r = ringBaseR + displacement
-        const x = Math.cos(a) * r
-        const y = Math.sin(a) * r
+        const r            = ringBaseR + displacement
+        const x            = Math.cos(a) * r
+        const y            = Math.sin(a) * r
         i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
       }
       ctx.closePath()
-      ctx.strokeStyle = "rgba(77,184,255,0.18)"
-      ctx.lineWidth = 1
+      ctx.strokeStyle = "rgba(77,184,255,0.15)"
+      ctx.lineWidth   = 1
       ctx.stroke()
       ctx.restore()
 
-      // ── LAYER 2: OSCILLOSCOPE SINE WAVES ─────────────────────────────
+      // ── OSCILLOSCOPE SINE WAVES ──────────────────────────────────────
       for (const w of waves) {
         w.phase += w.speed
         ctx.beginPath()
@@ -168,7 +186,7 @@ export default function MusicBackgroundCanvas() {
           x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
         }
         ctx.strokeStyle = `rgba(77,184,255,${w.opacity})`
-        ctx.lineWidth = w.lw
+        ctx.lineWidth   = w.lw
         ctx.stroke()
       }
 
