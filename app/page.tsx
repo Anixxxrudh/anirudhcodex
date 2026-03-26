@@ -25,7 +25,7 @@ const SECTIONS = [
   { key: "about",    label: "ABOUT",    mode: "about"    },
   { key: "projects", label: "PROJECTS", mode: "projects" },
   { key: "physics",  label: "PHYSICS",  mode: "physics"  },
-  { key: "climbing", label: "CLIMBING", mode: "climbing" },
+  { key: "hobbies",  label: "HOBBIES",  mode: "hobbies"  },
   { key: "timeline", label: "TIMELINE", mode: "home"     },
   { key: "skills",   label: "SKILLS",   mode: "physics"  },
   { key: "blog",     label: "WRITING",  mode: "about"    },
@@ -39,7 +39,7 @@ const FLASH_CLASS: Record<string, string> = {
   about:    "flash-blue",
   projects: "flash-blue",
   physics:  "flash-blue",
-  climbing: "flash-green",
+  hobbies:  "flash-blue",
   contact:  "flash-blue",
 }
 
@@ -68,7 +68,7 @@ export default function Page() {
   const aboutRef    = useRef<HTMLElement>(null)
   const projectsRef = useRef<HTMLElement>(null)
   const physicsRef  = useRef<HTMLElement>(null)
-  const climbingRef = useRef<HTMLElement>(null)
+  const hobbiesRef  = useRef<HTMLElement>(null)
   const timelineRef = useRef<HTMLDivElement>(null)
   const skillsRef   = useRef<HTMLDivElement>(null)
   const blogRef     = useRef<HTMLDivElement>(null)
@@ -86,7 +86,7 @@ export default function Page() {
       about:    aboutRef,
       projects: projectsRef,
       physics:  physicsRef,
-      climbing: climbingRef,
+      hobbies:  hobbiesRef,
       timeline: timelineRef,
       skills:   skillsRef,
       blog:     blogRef,
@@ -184,7 +184,7 @@ export default function Page() {
       about:    "rgba(77,184,255,0.7)",
       projects: "rgba(77,184,255,0.7)",
       physics:  "rgba(0,229,255,0.7)",
-      climbing: "rgba(126,217,87,0.7)",
+      hobbies:  "rgba(77,184,255,0.7)",
       contact:  "rgba(77,184,255,0.7)",
     }
     const container = snapRef.current
@@ -239,7 +239,7 @@ export default function Page() {
 
   // ─── KEYBOARD NAVIGATION ─────────────────────────────────────────
   useEffect(() => {
-    const KEYS = ["home","about","projects","physics","climbing","timeline","skills","blog","collab","quotes","contact"]
+    const KEYS = ["home","about","projects","physics","hobbies","timeline","skills","blog","collab","quotes","contact"]
     let gPressed = false
     let gTimer: ReturnType<typeof setTimeout> | null = null
     let kbShownRef = false
@@ -587,23 +587,33 @@ export default function Page() {
           </section>
 
 
-          {/* ── CLIMBING ────────────────────────────────────────── */}
-          <section ref={climbingRef} className="fade-section snap-section" data-mode="climbing" style={{ paddingTop: "100px", paddingBottom: "80px", position: "relative" }}>
-            <span className="section-ghost-number">05</span>
-            <div className="placeholder-section mode-climbing">
-              <div className="section-eyebrow">Climbing / Outdoors</div>
-              <ScrambleText text={"Problems on\nRock."} className="section-title" />
-              <div className="placeholder-grid">
-                {[
-                  { label: "Discipline",  title: "Intermediate Climbing",          body: "Mostly indoor right now, working toward more outdoor routes. Climbing, for me, is a mental discipline as much as a physical one — reading a problem, committing to a sequence, staying precise under pressure. The same qualities that make a good researcher." },
-                  { label: "Leadership",  title: "Wilderness Exploration Club",    body: "As President, I plan and execute day hikes, climbing sessions, and multi-day wilderness trips for the club. Logistics, safety, and keeping people moving — it is a different kind of systems problem, but a real one." },
-                  { label: "Gallery — Coming Soon", title: "Trip Photos & Routes", body: "Photos, trip logs, and route documentation from club expeditions will be added here. Check back after the next trip." },
-                ].map((c) => (
-                  <TiltCard key={c.title} className="placeholder-card">
-                    <span className="placeholder-card-label">{c.label}</span>
-                    <h3 className="placeholder-card-title">{c.title}</h3>
-                    <p className="placeholder-card-body">{c.body}</p>
-                  </TiltCard>
+          {/* ── HOBBIES ─────────────────────────────────────────── */}
+          <section ref={hobbiesRef} className="fade-section snap-section hobbies-section" data-mode="hobbies" style={{ paddingTop: "100px", paddingBottom: "80px", position: "relative" }}>
+            <span className="section-ghost-number">04</span>
+            <div className="hobbies-inner">
+              <div className="section-eyebrow">Beyond the Lab</div>
+              <ScrambleText text={"Life\nOutside the Lab."} className="section-title" />
+              <p className="hobbies-sub">Click any card to explore photos &amp; videos.</p>
+              <div className="hobbies-grid">
+                {([
+                  { id: "climbing",  name: "Climbing",  icon: "⟰", tagline: "Reading rock like code.",          accent: "#7ed957" },
+                  { id: "guitar",    name: "Guitar",    icon: "♬", tagline: "Six strings, infinite patterns.",  accent: "#4db8ff" },
+                  { id: "djing",     name: "DJing",     icon: "◎", tagline: "Sets built like narratives.",      accent: "#a78bfa" },
+                  { id: "badminton", name: "Badminton", icon: "◈", tagline: "Precision under pressure.",        accent: "#fbbf24" },
+                  { id: "hiking",    name: "Hiking",    icon: "△", tagline: "Wilderness, measured in miles.",   accent: "#34d399" },
+                  { id: "art",       name: "Art",       icon: "✦", tagline: "Making sense through making.",     accent: "#f472b6" },
+                ] as { id: string; name: string; icon: string; tagline: string; accent: string }[]).map((h) => (
+                  <a
+                    key={h.id}
+                    href={`/hobbies/${h.id}`}
+                    className="hobby-card"
+                    style={{ ["--hobby-accent" as string]: h.accent }}
+                  >
+                    <span className="hobby-icon">{h.icon}</span>
+                    <h3 className="hobby-name">{h.name}</h3>
+                    <p className="hobby-tagline">{h.tagline}</p>
+                    <span className="hobby-arrow">View Gallery →</span>
+                  </a>
                 ))}
               </div>
             </div>

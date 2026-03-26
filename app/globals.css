@@ -82,9 +82,9 @@ canvas {
   background: rgba(0,8,20,0.3);
   border-bottom-color: rgba(77,184,255,0.1);
 }
-.navbar[data-mode="climbing"] {
-  background: rgba(5,15,5,0.3);
-  border-bottom-color: rgba(126,217,87,0.1);
+.navbar[data-mode="hobbies"] {
+  background: rgba(3,8,18,0.3);
+  border-bottom-color: rgba(77,184,255,0.1);
 }
 .navbar[data-mode="physics"] {
   background: rgba(0,10,20,0.3);
@@ -492,22 +492,105 @@ section {
 
 /* ── Music: cold blue ────────────────────────────────────────────────── */
 
-/* ── Climbing: green glow ───────────────────────────────────────────── */
-.mode-climbing .placeholder-card:hover {
-  border-color: rgba(126, 217, 87, 0.4);
-  background: rgba(126, 217, 87, 0.04);
+/* ─── HOBBIES SECTION ───────────────────────────────────────────────── */
+.hobbies-section {
+  min-height: 100vh;
 }
-.mode-climbing .placeholder-card-title {
-  background: linear-gradient(90deg, #fff 0%, #7ed957 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: shimmerText 5s ease-in-out infinite;
-  background-size: 200% auto;
+.hobbies-inner {
+  position: relative;
+  z-index: 2;
+  padding: 0 clamp(24px, 6vw, 96px);
+  max-width: 1200px;
+  margin: 0 auto;
 }
-.mode-climbing .placeholder-card-label {
-  color: rgba(126, 217, 87, 0.6);
+.hobbies-sub {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.35);
+  margin-top: 12px;
+  font-family: var(--font-body);
 }
+.hobbies-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 48px;
+}
+@media (max-width: 900px) {
+  .hobbies-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .hobbies-grid { grid-template-columns: 1fr; }
+}
+.hobby-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 28px 24px;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.025);
+  text-decoration: none;
+  cursor: none;
+  transition: transform 0.28s ease, border-color 0.28s ease, background 0.28s ease, box-shadow 0.28s ease;
+  position: relative;
+  overflow: hidden;
+}
+.hobby-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: radial-gradient(circle at 30% 30%, var(--hobby-accent, #4db8ff), transparent 65%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.hobby-card:hover {
+  transform: translateY(-5px);
+  border-color: color-mix(in srgb, var(--hobby-accent, #4db8ff) 45%, transparent);
+  background: rgba(255,255,255,0.04);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.35), 0 0 30px color-mix(in srgb, var(--hobby-accent, #4db8ff) 12%, transparent);
+}
+.hobby-card:hover::before { opacity: 0.06; }
+.hobby-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--hobby-accent, #4db8ff);
+  filter: drop-shadow(0 0 8px var(--hobby-accent, #4db8ff));
+  transition: filter 0.3s ease;
+}
+.hobby-card:hover .hobby-icon {
+  filter: drop-shadow(0 0 14px var(--hobby-accent, #4db8ff));
+}
+.hobby-name {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.88);
+  margin: 0;
+}
+.hobby-tagline {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.42);
+  line-height: 1.5;
+  font-family: var(--font-body);
+  flex: 1;
+}
+.hobby-arrow {
+  font-family: var(--font-display);
+  font-size: 0.48rem;
+  letter-spacing: 0.18em;
+  color: var(--hobby-accent, #4db8ff);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.hobby-card:hover .hobby-arrow {
+  opacity: 0.8;
+  transform: translateX(0);
+}
+
 
 @keyframes shimmerText {
   0%   { background-position: 0% center; }
@@ -528,15 +611,8 @@ section {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-.mode-climbing .section-title {
-  background: linear-gradient(135deg, #fff 30%, #7ed957 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
 .mode-physics .section-eyebrow  { color: rgba(0, 229, 255, 0.65); }
 .mode-music .section-eyebrow    { color: rgba(77, 184, 255, 0.65); }
-.mode-climbing .section-eyebrow { color: rgba(126, 217, 87, 0.65); }
 
 /* ─── CONTACT ───────────────────────────────────────────────────────── */
 .contact-section {
@@ -1895,13 +1971,9 @@ section {
 .now-section::before      { background: #ffffff; }
 .skills-section::before   { background: #4db8ff; }
 
-.mode-physics .section-title,
-.mode-music .section-title,
-.mode-climbing .section-title { position: relative; }
+.mode-physics .section-title { position: relative; }
 
-.mode-physics .section-title::after,
-.mode-music .section-title::after,
-.mode-climbing .section-title::after {
+.mode-physics .section-title::after {
   content: '';
   position: absolute;
   inset: -20px -40px;
@@ -1909,10 +1981,8 @@ section {
   filter: blur(40px);
   opacity: 0.08;
   z-index: -1;
+  background: #00e5ff;
 }
-.mode-physics .section-title::after  { background: #00e5ff; }
-.mode-music .section-title::after    { background: #4db8ff; }
-.mode-climbing .section-title::after { background: #7ed957; }
 
 /* ─── CURSOR TRAIL ───────────────────────────────────────────────────── */
 .cursor-trail-dot {
@@ -2922,4 +2992,100 @@ section {
   6%   { opacity: 1; }
   80%  { opacity: 1; }
   100% { opacity: 0; }
+}
+
+/* ─── HOBBY DETAIL PAGE ──────────────────────────────────────────────── */
+.hobby-page-shell {
+  min-height: 100vh;
+  background: #000;
+  padding: clamp(80px, 12vh, 140px) clamp(24px, 6vw, 96px) 80px;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+.hobby-back {
+  font-family: var(--font-display);
+  font-size: 0.52rem;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.35);
+  text-decoration: none;
+  transition: color 0.2s;
+  align-self: flex-start;
+}
+.hobby-back:hover { color: rgba(255,255,255,0.75); }
+.hobby-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.hobby-page-eyebrow {
+  font-family: var(--font-display);
+  font-size: 0.52rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.hobby-page-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin: 0;
+}
+.hobby-page-tagline {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.4);
+  font-style: italic;
+  font-family: var(--font-body);
+}
+.hobby-page-desc {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.8;
+  max-width: 600px;
+  font-family: var(--font-body);
+  margin-top: 4px;
+}
+.hobby-media-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 768px) {
+  .hobby-media-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .hobby-media-grid { grid-template-columns: 1fr; }
+}
+.hobby-media-slot {
+  aspect-ratio: 4/3;
+  border: 1px dashed rgba(255,255,255,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.hobby-media-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.02);
+  transition: background 0.2s;
+}
+.hobby-media-placeholder:hover { background: rgba(255,255,255,0.04); }
+.hobby-media-icon {
+  font-size: 1.4rem;
+  opacity: 0.3;
+}
+.hobby-media-label {
+  font-family: var(--font-display);
+  font-size: 0.4rem;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.2);
+  text-transform: uppercase;
 }
