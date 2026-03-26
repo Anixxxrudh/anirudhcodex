@@ -14,7 +14,6 @@ const NAV_ITEMS = [
   { key: "about",    label: "About"    },
   { key: "projects", label: "Projects" },
   { key: "physics",  label: "Physics"  },
-  { key: "music",    label: "Music"    },
   { key: "climbing", label: "Climbing" },
   { key: "contact",  label: "Contact"  },
 ]

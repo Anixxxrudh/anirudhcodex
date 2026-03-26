@@ -19,14 +19,12 @@ import CommandPalette    from "../components/CommandPalette"
 import ContextMenu       from "../components/ContextMenu"
 import CollabSection     from "../components/CollabSection"
 import CursorSystem      from "../components/CursorSystem"
-import MusicBackgroundCanvas from "../components/MusicBackgroundCanvas"
 
 const SECTIONS = [
   { key: "home",     label: "HOME",     mode: "home"     },
   { key: "about",    label: "ABOUT",    mode: "about"    },
   { key: "projects", label: "PROJECTS", mode: "projects" },
   { key: "physics",  label: "PHYSICS",  mode: "physics"  },
-  { key: "music",    label: "MUSIC",    mode: "music"    },
   { key: "climbing", label: "CLIMBING", mode: "climbing" },
   { key: "timeline", label: "TIMELINE", mode: "home"     },
   { key: "skills",   label: "SKILLS",   mode: "physics"  },
@@ -41,7 +39,6 @@ const FLASH_CLASS: Record<string, string> = {
   about:    "flash-blue",
   projects: "flash-blue",
   physics:  "flash-blue",
-  music:    "flash-blue",
   climbing: "flash-green",
   contact:  "flash-blue",
 }
@@ -71,7 +68,6 @@ export default function Page() {
   const aboutRef    = useRef<HTMLElement>(null)
   const projectsRef = useRef<HTMLElement>(null)
   const physicsRef  = useRef<HTMLElement>(null)
-  const musicRef    = useRef<HTMLElement>(null)
   const climbingRef = useRef<HTMLElement>(null)
   const timelineRef = useRef<HTMLDivElement>(null)
   const skillsRef   = useRef<HTMLDivElement>(null)
@@ -90,7 +86,6 @@ export default function Page() {
       about:    aboutRef,
       projects: projectsRef,
       physics:  physicsRef,
-      music:    musicRef,
       climbing: climbingRef,
       timeline: timelineRef,
       skills:   skillsRef,
@@ -189,7 +184,6 @@ export default function Page() {
       about:    "rgba(77,184,255,0.7)",
       projects: "rgba(77,184,255,0.7)",
       physics:  "rgba(0,229,255,0.7)",
-      music:    "rgba(255,124,56,0.7)",
       climbing: "rgba(126,217,87,0.7)",
       contact:  "rgba(77,184,255,0.7)",
     }
@@ -245,7 +239,7 @@ export default function Page() {
 
   // ─── KEYBOARD NAVIGATION ─────────────────────────────────────────
   useEffect(() => {
-    const KEYS = ["home","about","projects","physics","music","climbing","timeline","skills","blog","collab","quotes","contact"]
+    const KEYS = ["home","about","projects","physics","climbing","timeline","skills","blog","collab","quotes","contact"]
     let gPressed = false
     let gTimer: ReturnType<typeof setTimeout> | null = null
     let kbShownRef = false
@@ -394,7 +388,7 @@ export default function Page() {
                 THE ANIRUDH PROTOCOL
               </h1>
               <p className="home-tagline">
-                Astrophysics&nbsp;&nbsp;·&nbsp;&nbsp;Photovoltaics&nbsp;&nbsp;·&nbsp;&nbsp;Climbing&nbsp;&nbsp;·&nbsp;&nbsp;Music
+                Astrophysics&nbsp;&nbsp;·&nbsp;&nbsp;Photovoltaics&nbsp;&nbsp;·&nbsp;&nbsp;Climbing
               </p>
               <div className="crawl-wrapper">
                 <div className={`crawl-inner${loaded ? "" : " crawl-paused"}`}>
@@ -592,123 +586,6 @@ export default function Page() {
             <SolarSystem />
           </section>
 
-          {/* ── MUSIC ───────────────────────────────────────────── */}
-          <section ref={musicRef} className="fade-section snap-section music-section" data-mode="music" style={{ position: "relative", overflow: "hidden" }}>
-            <MusicBackgroundCanvas />
-            <span className="section-ghost-number">04</span>
-            <div className="music-inner">
-
-              {/* Header */}
-              <div className="music-header">
-                <div className="section-eyebrow mode-music">Music / DJ</div>
-                <ScrambleText text={"Sound as\na System."} className="section-title mode-music" />
-                {/* Upgraded EQ bars — 20 bars, each with independent duration */}
-                <div className="music-eq-bars">
-                  {[0.45,0.75,1.0,0.6,0.85,0.35,0.95,0.55,1.0,0.7,0.4,0.88,0.5,1.0,0.65,0.3,0.9,0.5,0.8,0.45].map((h, i) => (
-                    <div
-                      key={i}
-                      className="music-eq-bar"
-                      style={{
-                        ["--bar-h" as string]:    `${h * 100}%`,
-                        ["--bar-delay" as string]: `${i * 0.055}s`,
-                        ["--bar-dur" as string]:   `${0.42 + (i % 5) * 0.09}s`,
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Cold blue divider line */}
-              <div className="music-divider" />
-
-              {/* Body: info + tracklist left, frosted embed right */}
-              <div className="music-body">
-                <div className="music-info">
-                  {[
-                    { label: "Genre",      value: "Deep House · Minimal Techno · Ambient" },
-                    { label: "Approach",   value: "Sets built like narratives — tension, release, texture, resolution. Immersion over impact." },
-                    { label: "Influences", value: "Four Tet · Bicep · Jon Hopkins · Floating Points · Burial" },
-                    { label: "Currently",  value: "Building sets, curating My Axiom on Apple Music" },
-                  ].map(({ label, value }) => (
-                    <div key={label} className="music-row">
-                      <span className="music-row-label">{label}</span>
-                      <span className="music-row-value">{value}</span>
-                    </div>
-                  ))}
-
-                  {/* Tracklist preview */}
-                  <div className="music-tracklist">
-                    <div className="music-tracklist-label">TRACKLIST HIGHLIGHTS</div>
-                    {[
-                      { n: "01", title: "Yugen",    artist: "Four Tet" },
-                      { n: "02", title: "Glue",     artist: "Bicep" },
-                      { n: "03", title: "Cascade",  artist: "Jon Hopkins" },
-                      { n: "04", title: "Les Alpx", artist: "Floating Points" },
-                    ].map((t) => (
-                      <div key={t.n} className="music-track">
-                        <span className="music-track-n">{t.n}</span>
-                        <div className="music-track-info">
-                          <span className="music-track-title">{t.title}</span>
-                          <span className="music-track-artist">{t.artist}</span>
-                        </div>
-                        <div className="music-track-bar" />
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Genre tags — staggered animation */}
-                  <div className="music-tags">
-                    {["Deep House","Techno","Ambient","Atmospheric","Electronic"].map((t, i) => (
-                      <span
-                        key={t}
-                        className="music-tag"
-                        style={{ ["--tag-delay" as string]: `${i * 0.12}s` }}
-                      >{t}</span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Frosted glass embed */}
-                <div className="music-embed-col">
-                  <div className="music-embed-label">MY AXIOM — PLAYLIST</div>
-                  <div className="music-glass">
-                    <iframe
-                      allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
-                      height="420"
-                      style={{ width: "100%", overflow: "hidden", borderRadius: "8px", border: 0, display: "block" }}
-                      sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
-                      src="https://embed.music.apple.com/us/playlist/my-axiom/pl.u-8aAVoV6HvRXxB1z?theme=dark"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Now Playing bar — decorative */}
-              <div className="now-playing-bar">
-                <div className="np-left">
-                  <div className="np-dot" />
-                  <div className="np-track-info">
-                    <span className="np-title">Cascade</span>
-                    <span className="np-artist">Jon Hopkins · Immunity</span>
-                  </div>
-                </div>
-                <div className="np-scrubber">
-                  <span className="np-time">2:14</span>
-                  <div className="np-track">
-                    <div className="np-fill" />
-                    <div className="np-thumb" />
-                  </div>
-                  <span className="np-time">6:58</span>
-                </div>
-                <div className="np-controls">
-                  <span className="np-icon">⏮</span>
-                  <span className="np-icon np-play">▶</span>
-                  <span className="np-icon">⏭</span>
-                </div>
-              </div>
-
-            </div>
-          </section>
 
           {/* ── CLIMBING ────────────────────────────────────────── */}
           <section ref={climbingRef} className="fade-section snap-section" data-mode="climbing" style={{ paddingTop: "100px", paddingBottom: "80px", position: "relative" }}>
@@ -803,10 +680,6 @@ export default function Page() {
               <a href="https://instagram.com/_chu.climbs" target="_blank" rel="noreferrer" className="social-link">
                 <span className="social-label">Climbing</span>
                 <span className="social-handle">@_chu.climbs</span>
-              </a>
-              <a href="https://music.apple.com/us/playlist/my-axiom/pl.u-8aAVoV6HvRXxB1z" target="_blank" rel="noreferrer" className="social-link social-link--music">
-                <span className="social-label">Apple Music</span>
-                <span className="social-handle">My Axiom — Playlist</span>
               </a>
             </div>
 
