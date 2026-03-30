@@ -19,6 +19,8 @@ import CommandPalette    from "../components/CommandPalette"
 import ContextMenu       from "../components/ContextMenu"
 import CollabSection     from "../components/CollabSection"
 import CursorSystem      from "../components/CursorSystem"
+import RevealText        from "../components/RevealText"
+import { motion, useInView, AnimatePresence } from "framer-motion"
 
 const SECTIONS = [
   { key: "home",     label: "HOME",     mode: "home"     },
@@ -383,13 +385,32 @@ export default function Page() {
           {/* ── HOME ────────────────────────────────────────────── */}
           <section ref={homeRef} className="home-section snap-section" data-mode="home" style={{ position: "relative" }}>
             <HeroCanvas />
+            {/* Boot scanline */}
+            <motion.div
+              className="hero-scanline"
+              initial={{ top: "-2px", opacity: 1 }}
+              animate={{ top: "100%", opacity: [1, 1, 0] }}
+              transition={{ duration: 1.4, ease: "easeInOut", delay: 0.3, times: [0, 0.8, 1] }}
+            />
             <div className="home-content">
-              <h1 ref={titleRef} className="home-name" data-text="THE ANIRUDH PROTOCOL">
+              <motion.h1
+                ref={titleRef}
+                className="home-name"
+                data-text="THE ANIRUDH PROTOCOL"
+                initial={{ opacity: 0, y: -24, filter: "blur(14px)", letterSpacing: "0.4em" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)", letterSpacing: undefined }}
+                transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1], delay: 0.9 }}
+              >
                 THE ANIRUDH PROTOCOL
-              </h1>
-              <p className="home-tagline">
+              </motion.h1>
+              <motion.p
+                className="home-tagline"
+                initial={{ opacity: 0, y: 16, filter: "blur(6px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 1.5 }}
+              >
                 Astrophysics&nbsp;&nbsp;·&nbsp;&nbsp;Photovoltaics&nbsp;&nbsp;·&nbsp;&nbsp;Climbing
-              </p>
+              </motion.p>
               <div className="crawl-wrapper">
                 <div className={`crawl-inner${loaded ? "" : " crawl-paused"}`}>
                   <p>A long time ago, in a lab not so far away...</p>
@@ -415,30 +436,65 @@ export default function Page() {
 
           {/* ── ABOUT (split screen) ─────────────────────────────── */}
           <section ref={aboutRef} className="about-section fade-section snap-section" data-mode="about" style={{ padding: 0, position: "relative" }}>
-            <span className="section-ghost-number">01</span>
+            <motion.span
+              className="section-ghost-number"
+              initial={{ scale: 3.5, opacity: 0, rotate: 12, filter: "blur(8px)" }}
+              whileInView={{ scale: 1, opacity: 1, rotate: 0, filter: "blur(0px)" }}
+              transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
+              viewport={{ once: true, amount: 0.5 }}
+            >01</motion.span>
             <div className="about-split">
               {/* Left: image */}
-              <div className="about-split-image">
+              <motion.div
+                className="about-split-image"
+                initial={{ opacity: 0, scale: 0.88, filter: "blur(14px)", x: -40 }}
+                whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)", x: 0 }}
+                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                viewport={{ once: true, amount: 0.3 }}
+              >
                 <img src="/profile.jpg" alt="Anirudh Menon" />
-              </div>
+              </motion.div>
               {/* Right: content */}
-              <div className="about-split-content">
-                <div className="section-eyebrow">About</div>
-                <h2 className="section-title">Physicist.<br />Researcher.<br />Builder.</h2>
-                <p className="about-lead">
+              <motion.div
+                className="about-split-content"
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={{ hidden: {}, show: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } } }}
+              >
+                <div style={{ overflow: "hidden" }}>
+                  <motion.div
+                    className="section-eyebrow"
+                    variants={{ hidden: { y: "110%", opacity: 0 }, show: { y: "0%", opacity: 1, transition: { duration: 0.55, ease: [0.16,1,0.3,1] } } }}
+                  >About</motion.div>
+                </div>
+                <RevealText text={"Physicist.\nResearcher.\nBuilder."} className="section-title" />
+                <motion.p
+                  className="about-lead"
+                  variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16,1,0.3,1] } } }}
+                >
                   Sophomore at the University of Toledo — Physics (Astrophysics track), minor in Data Science.
                   Researcher at the Wright Center for Photovoltaics (PVIC) and President of the Wilderness Exploration Club.
-                </p>
-                <p className="about-body">
+                </motion.p>
+                <motion.p
+                  className="about-body"
+                  variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16,1,0.3,1] } } }}
+                >
                   At PVIC, I engineer CdTe/CdSeTe thin-film solar devices — focusing on back-interface recombination
                   reduction via SWCNT networks and ALD-deposited Al₂O₃. Full fabrication and characterization pipeline:
                   sputtering, ALD, gold deposition, JV/EQE analysis in Python, JMP, and IGOR.
-                </p>
-                <div className="about-tags">
+                </motion.p>
+                <motion.div
+                  className="about-tags"
+                  variants={{ hidden: {}, show: { transition: { staggerChildren: 0.045, delayChildren: 0.2 } } }}
+                >
                   {["Device Fabrication","ALD","Sputtering","JV / EQE","Python","JMP","IGOR","Data Science","CdTe/CdSeTe"].map((t) => (
-                    <span className="tag" key={t}>{t}</span>
+                    <motion.span
+                      className="tag" key={t}
+                      variants={{ hidden: { opacity: 0, scale: 0.6, y: 10 }, show: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", stiffness: 280, damping: 18 } } }}
+                    >{t}</motion.span>
                   ))}
-                </div>
+                </motion.div>
                 {/* Stats */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
                   {[
@@ -454,7 +510,7 @@ export default function Page() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             </div>
           </section>
 
