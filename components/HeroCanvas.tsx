@@ -5,6 +5,17 @@ interface FieldStar { x: number; y: number; r: number; alpha: number; phase: num
 interface ShootStar { x: number; y: number; vx: number; vy: number; life: number; maxLife: number; alpha: number }
 interface Particle  { x: number; y: number; homeX: number; homeY: number; vx: number; vy: number; r: number; alpha: number; blue: boolean }
 interface Orbit     { rx: number; ry: number; tilt: number; speed: number; angle: number; color: string; trail: { x: number; y: number }[] }
+interface PlasmaParticle { x: number; y: number; vx: number; vy: number; life: number; maxLife: number; r: number; hue: number }
+interface Rocket {
+  x: number; y: number
+  angle: number        // current heading (radians, 0 = right)
+  targetAngle: number
+  speed: number
+  steerTimer: number
+  trail: { x: number; y: number; age: number }[]
+  plasma: PlasmaParticle[]
+  exhaustPhase: number
+}
 
 function buildFieldStars(W: number, H: number, count: number): FieldStar[] {
   return Array.from({ length: count }, () => ({
@@ -15,6 +26,145 @@ function buildFieldStars(W: number, H: number, count: number): FieldStar[] {
     phase: Math.random() * Math.PI * 2,
     speed: 0.004 + Math.random() * 0.012,
   }))
+}
+
+function buildRocket(W: number, H: number): Rocket {
+  const angle = Math.random() * Math.PI * 2
+  return {
+    x: W * (0.2 + Math.random() * 0.6),
+    y: H * (0.2 + Math.random() * 0.6),
+    angle,
+    targetAngle: angle,
+    speed: 1.4 + Math.random() * 0.8,
+    steerTimer: 0,
+    trail: [],
+    plasma: [],
+    exhaustPhase: Math.random() * Math.PI * 2,
+  }
+}
+
+function spawnPlasma(r: Rocket): void {
+  // emit from rocket engine (opposite of heading)
+  const exhaustAngle = r.angle + Math.PI
+  const spread = 0.45
+  for (let i = 0; i < 2; i++) {
+    const a = exhaustAngle + (Math.random() - 0.5) * spread
+    const spd = 1.2 + Math.random() * 2.2
+    const life = 22 + Math.random() * 18
+    r.plasma.push({
+      x: r.x + Math.cos(exhaustAngle) * 10,
+      y: r.y + Math.sin(exhaustAngle) * 10,
+      vx: Math.cos(a) * spd,
+      vy: Math.sin(a) * spd,
+      life, maxLife: life,
+      r: 1.5 + Math.random() * 2.5,
+      // hue: 180–240 = cyan/blue/indigo for cold fusion
+      hue: 180 + Math.random() * 60,
+    })
+  }
+}
+
+function drawRocket(ctx: CanvasRenderingContext2D, r: Rocket, t: number): void {
+  ctx.save()
+  ctx.translate(r.x, r.y)
+  // heading: angle=0 means moving right; rotate so nose points in direction of travel
+  ctx.rotate(r.angle - Math.PI / 2)
+
+  // — Engine glow bloom behind rocket —
+  const bloom = ctx.createRadialGradient(0, 14, 0, 0, 14, 22)
+  bloom.addColorStop(0, `rgba(0,220,255,${0.55 + 0.15 * Math.sin(t * 0.18 + r.exhaustPhase)})`)
+  bloom.addColorStop(0.4, "rgba(120,80,255,0.18)")
+  bloom.addColorStop(1, "rgba(0,0,0,0)")
+  ctx.shadowBlur = 28
+  ctx.shadowColor = "#00dcff"
+  ctx.beginPath()
+  ctx.arc(0, 14, 22, 0, Math.PI * 2)
+  ctx.fillStyle = bloom
+  ctx.fill()
+
+  // — Exhaust plume cone (cold fusion plasma jet) —
+  const plumeLen = 20 + 8 * Math.sin(t * 0.22 + r.exhaustPhase)
+  const plumeGrad = ctx.createLinearGradient(0, 14, 0, 14 + plumeLen)
+  plumeGrad.addColorStop(0, "rgba(255,255,255,0.85)")
+  plumeGrad.addColorStop(0.2, "rgba(0,230,255,0.65)")
+  plumeGrad.addColorStop(0.55, "rgba(100,60,255,0.35)")
+  plumeGrad.addColorStop(1, "rgba(0,0,0,0)")
+  ctx.beginPath()
+  ctx.moveTo(-4.5, 14)
+  ctx.quadraticCurveTo(-8, 14 + plumeLen * 0.5, -1.5, 14 + plumeLen)
+  ctx.lineTo(1.5, 14 + plumeLen)
+  ctx.quadraticCurveTo(8, 14 + plumeLen * 0.5, 4.5, 14)
+  ctx.closePath()
+  ctx.fillStyle = plumeGrad
+  ctx.fill()
+
+  // — Rocket body —
+  ctx.shadowBlur = 18
+  ctx.shadowColor = "#00e5ff"
+
+  // fuselage
+  ctx.beginPath()
+  ctx.moveTo(0, -18)         // nose tip
+  ctx.lineTo(5, -6)          // right shoulder
+  ctx.lineTo(5.5, 8)         // right waist
+  ctx.lineTo(4, 14)          // right base
+  ctx.lineTo(-4, 14)         // left base
+  ctx.lineTo(-5.5, 8)        // left waist
+  ctx.lineTo(-5, -6)         // left shoulder
+  ctx.closePath()
+  const bodyGrad = ctx.createLinearGradient(-6, -18, 6, 14)
+  bodyGrad.addColorStop(0, "rgba(220,245,255,0.95)")
+  bodyGrad.addColorStop(0.4, "rgba(120,200,255,0.85)")
+  bodyGrad.addColorStop(1, "rgba(60,100,200,0.75)")
+  ctx.fillStyle = bodyGrad
+  ctx.fill()
+  ctx.strokeStyle = "rgba(0,230,255,0.7)"
+  ctx.lineWidth = 0.8
+  ctx.stroke()
+
+  // left fin
+  ctx.beginPath()
+  ctx.moveTo(-4.5, 8)
+  ctx.lineTo(-12, 18)
+  ctx.lineTo(-4, 14)
+  ctx.closePath()
+  ctx.fillStyle = "rgba(80,160,255,0.75)"
+  ctx.fill()
+  ctx.strokeStyle = "rgba(0,200,255,0.5)"
+  ctx.lineWidth = 0.6
+  ctx.stroke()
+
+  // right fin
+  ctx.beginPath()
+  ctx.moveTo(4.5, 8)
+  ctx.lineTo(12, 18)
+  ctx.lineTo(4, 14)
+  ctx.closePath()
+  ctx.fillStyle = "rgba(80,160,255,0.75)"
+  ctx.fill()
+  ctx.stroke()
+
+  // cockpit window
+  ctx.shadowBlur = 10
+  ctx.shadowColor = "#00ffff"
+  const winGrad = ctx.createRadialGradient(-1.5, -8, 0, 0, -6, 5)
+  winGrad.addColorStop(0, "rgba(200,255,255,1)")
+  winGrad.addColorStop(0.5, "rgba(0,200,255,0.8)")
+  winGrad.addColorStop(1, "rgba(0,60,180,0.5)")
+  ctx.beginPath()
+  ctx.ellipse(0, -7, 3.2, 4, 0, 0, Math.PI * 2)
+  ctx.fillStyle = winGrad
+  ctx.fill()
+
+  // nose tip hot point
+  ctx.shadowBlur = 16
+  ctx.shadowColor = "#ffffff"
+  ctx.beginPath()
+  ctx.arc(0, -18, 1.5, 0, Math.PI * 2)
+  ctx.fillStyle = "rgba(255,255,255,0.95)"
+  ctx.fill()
+
+  ctx.restore()
 }
 
 export default function HeroCanvas() {
@@ -31,12 +181,14 @@ export default function HeroCanvas() {
     let t = 0
     let fieldStars: FieldStar[] = []
     let shoots: ShootStar[] = []
+    let rockets: Rocket[] = []
 
     const resize = () => {
       W = canvas.offsetWidth; H = canvas.offsetHeight
       canvas.width = W; canvas.height = H
       cx = W / 2; cy = H / 2
       fieldStars = buildFieldStars(W, H, 520)
+      rockets = [buildRocket(W, H), buildRocket(W, H)]
     }
     resize()
     const ro = new ResizeObserver(resize)
@@ -87,6 +239,93 @@ export default function HeroCanvas() {
         life, maxLife: life, alpha: 0.9 + Math.random()*0.1 })
     }
     let shootTimer = 0
+
+    // ── Rocket update ────────────────────────────────────────────
+    const updateRockets = () => {
+      for (const r of rockets) {
+        r.exhaustPhase += 0.08
+
+        // steering: pick new target angle every ~90 frames
+        r.steerTimer++
+        if (r.steerTimer >= 90) {
+          r.steerTimer = 0
+          r.targetAngle = r.angle + (Math.random() - 0.5) * Math.PI * 1.1
+        }
+
+        // steer away from edges (margin = 15% of dimension)
+        const mx = W * 0.15, my = H * 0.15
+        if (r.x < mx)        r.targetAngle = 0
+        if (r.x > W - mx)    r.targetAngle = Math.PI
+        if (r.y < my)        r.targetAngle = Math.PI / 2
+        if (r.y > H - my)    r.targetAngle = -Math.PI / 2
+
+        // smooth angle interpolation (short-path wrap)
+        let da = r.targetAngle - r.angle
+        while (da >  Math.PI) da -= Math.PI * 2
+        while (da < -Math.PI) da += Math.PI * 2
+        r.angle += da * 0.028
+
+        // move
+        r.x += Math.cos(r.angle) * r.speed
+        r.y += Math.sin(r.angle) * r.speed
+
+        // trail
+        r.trail.unshift({ x: r.x, y: r.y, age: 0 })
+        for (const pt of r.trail) pt.age++
+        if (r.trail.length > 60) r.trail.pop()
+
+        // emit plasma
+        spawnPlasma(r)
+
+        // update plasma particles
+        for (let i = r.plasma.length - 1; i >= 0; i--) {
+          const p = r.plasma[i]
+          p.x += p.vx; p.y += p.vy
+          p.vx *= 0.95; p.vy *= 0.95
+          p.life--
+          if (p.life <= 0) r.plasma.splice(i, 1)
+        }
+      }
+    }
+
+    // ── Rocket draw ──────────────────────────────────────────────
+    const drawRockets = () => {
+      for (const r of rockets) {
+        // Ion trail (fading line)
+        if (r.trail.length > 1) {
+          for (let i = 1; i < r.trail.length; i++) {
+            const frac = 1 - i / r.trail.length
+            const alpha = frac * frac * 0.55
+            const width = frac * 2.5
+            ctx.beginPath()
+            ctx.moveTo(r.trail[i-1].x, r.trail[i-1].y)
+            ctx.lineTo(r.trail[i].x,   r.trail[i].y)
+            ctx.strokeStyle = `rgba(0,210,255,${alpha})`
+            ctx.lineWidth = width
+            ctx.shadowBlur = frac * 8
+            ctx.shadowColor = "#00dcff"
+            ctx.stroke()
+          }
+        }
+
+        // Plasma particles
+        ctx.save()
+        for (const p of r.plasma) {
+          const frac = p.life / p.maxLife
+          const alpha = frac * frac * 0.9
+          ctx.shadowBlur = 12
+          ctx.shadowColor = `hsl(${p.hue},100%,70%)`
+          ctx.beginPath()
+          ctx.arc(p.x, p.y, p.r * frac, 0, Math.PI * 2)
+          ctx.fillStyle = `hsla(${p.hue},100%,75%,${alpha})`
+          ctx.fill()
+        }
+        ctx.restore()
+
+        // Rocket body
+        drawRocket(ctx, r, t)
+      }
+    }
 
     const draw = () => {
       t++
@@ -147,6 +386,10 @@ export default function HeroCanvas() {
         ctx.fillStyle = p.blue ? `rgba(77,184,255,${p.alpha})` : `rgba(255,255,255,${p.alpha})`
         ctx.fill()
       }
+
+      // Rockets
+      updateRockets()
+      drawRockets()
 
       // Orbit ellipses
       ctx.save(); ctx.translate(cx, cy)
