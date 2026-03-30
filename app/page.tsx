@@ -324,7 +324,7 @@ export default function Page() {
       <CursorSystem />
 
       {/* Background canvas */}
-      <BackgroundCanvas mode={mode} />
+      <BackgroundCanvas mode={mode} scrollProgress={scrollProgress} />
 
       {/* Navbar */}
       <Navbar setMode={setMode} mode={mode} scrollToSection={navigateWithTransition} />
