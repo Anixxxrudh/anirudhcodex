@@ -40,7 +40,7 @@ function buildRocket(W: number, H: number): Rocket {
 function drawRocketBody(ctx: CanvasRenderingContext2D, r: Rocket, t: number): void {
   ctx.save()
   ctx.translate(r.x, r.y)
-  ctx.rotate(r.angle - Math.PI / 2)
+  ctx.rotate(r.angle + Math.PI / 2)
 
   // Engine bloom — ONE shadowBlur call, not in a loop
   const bloom = ctx.createRadialGradient(0, 14, 0, 0, 14, 18)
