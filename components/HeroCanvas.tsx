@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useRef } from "react"
 
-interface FieldStar { x: number; y: number; r: number; alpha: number; phase: number; speed: number }
+interface FieldStar { x: number; y: number; r: number; alpha: number; phase: number; speed: number; color: string }
 interface ShootStar { x: number; y: number; vx: number; vy: number; life: number; maxLife: number; alpha: number }
 interface Particle  { x: number; y: number; homeX: number; homeY: number; vx: number; vy: number; r: number; alpha: number; blue: boolean }
 interface Orbit     { rx: number; ry: number; tilt: number; speed: number; angle: number; color: string; trail: { x: number; y: number }[] }
@@ -16,13 +16,24 @@ interface Rocket {
 }
 
 function buildFieldStars(W: number, H: number, count: number): FieldStar[] {
-  return Array.from({ length: count }, () => ({
-    x: Math.random() * W, y: Math.random() * H,
-    r: 0.3 + Math.random() * 1.1,
-    alpha: 0.08 + Math.random() * 0.30,
-    phase: Math.random() * Math.PI * 2,
-    speed: 0.004 + Math.random() * 0.012,
-  }))
+  return Array.from({ length: count }, () => {
+    const roll = Math.random()
+    const color =
+      roll < 0.06 ? "155,176,255"   // O/B: hot blue-white
+    : roll < 0.18 ? "170,191,255"   // A: blue-white
+    : roll < 0.36 ? "220,230,255"   // F: white
+    : roll < 0.55 ? "255,244,234"   // G: yellow-white (solar)
+    : roll < 0.73 ? "255,218,181"   // K: orange
+    :               "255,190,140"   // M: reddish
+    return {
+      x: Math.random() * W, y: Math.random() * H,
+      r: 0.3 + Math.random() * 1.2,
+      alpha: 0.08 + Math.random() * 0.32,
+      phase: Math.random() * Math.PI * 2,
+      speed: 0.004 + Math.random() * 0.012,
+      color,
+    }
+  })
 }
 
 function buildRocket(W: number, H: number): Rocket {
@@ -254,11 +265,23 @@ export default function HeroCanvas() {
         ctx.fillStyle = g; ctx.fill()
       }
 
-      // Starfield — no shadowBlur
+      // Starfield — realistic spectral colors + diffraction spikes on bright stars
       for (const s of fieldStars) {
         const a = s.alpha * (0.6 + 0.4 * Math.sin(s.phase + t * s.speed))
         ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2)
-        ctx.fillStyle = `rgba(200,230,255,${a})`; ctx.fill()
+        ctx.fillStyle = `rgba(${s.color},${a})`; ctx.fill()
+        // 4-point diffraction spike on larger/brighter stars
+        if (s.r > 0.85 && a > 0.18) {
+          const spikeLen = s.r * 5.5
+          for (let sp = 0; sp < 4; sp++) {
+            const sang = sp * Math.PI / 2
+            const sg = ctx.createLinearGradient(s.x, s.y, s.x + Math.cos(sang)*spikeLen, s.y + Math.sin(sang)*spikeLen)
+            sg.addColorStop(0, `rgba(${s.color},${a * 0.55})`)
+            sg.addColorStop(1, `rgba(${s.color},0)`)
+            ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(s.x + Math.cos(sang)*spikeLen, s.y + Math.sin(sang)*spikeLen)
+            ctx.strokeStyle = sg; ctx.lineWidth = 0.5; ctx.stroke()
+          }
+        }
       }
 
       // Shooting stars — no shadowBlur in loop
