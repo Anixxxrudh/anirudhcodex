@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useRef, useState } from "react"
 
-export type CursorMode = "pulsar" | "lightsaber" | "spaceship" | "blackhole"
+export type CursorMode = "pulsar" | "lightsaber" | "spaceship" | "blackhole" | "solarsystem"
 
 const W = 80
 const CX = 40
@@ -254,6 +254,90 @@ function drawBlackhole(
   ctx.fillStyle = "rgba(255,255,255,0.5)"; ctx.fill()
 }
 
+// ── SOLAR SYSTEM ──────────────────────────────────────────────────────────────
+interface SSPlanet { orbitR: number; angle: number; speed: number; r: number; color: string; trail: { x: number; y: number }[] }
+interface SolarSystemState { planets: SSPlanet[]; sunPulse: number; clickFlare: number }
+function initSolarSystem(): SolarSystemState {
+  return {
+    planets: [
+      { orbitR: 13, angle: 0,            speed: 0.07,  r: 2.2, color: "220,180,140", trail: [] },
+      { orbitR: 22, angle: Math.PI * 0.7, speed: 0.042, r: 2.8, color: "100,180,255", trail: [] },
+      { orbitR: 32, angle: Math.PI * 1.4, speed: 0.024, r: 2.0, color: "200,140,80",  trail: [] },
+    ],
+    sunPulse: 0,
+    clickFlare: 0,
+  }
+}
+
+function drawSolarSystem(
+  ctx: CanvasRenderingContext2D,
+  st: SolarSystemState,
+  hovered: boolean, justClicked: boolean
+) {
+  ctx.clearRect(0, 0, W, W)
+  const speedMult = hovered ? 2.2 : 1
+
+  if (justClicked) st.clickFlare = 12
+
+  st.sunPulse += 0.08
+  if (st.clickFlare > 0) st.clickFlare--
+
+  // Orbit rings
+  for (const p of st.planets) {
+    ctx.beginPath(); ctx.arc(CX, CY, p.orbitR, 0, Math.PI * 2)
+    ctx.strokeStyle = "rgba(255,255,255,0.07)"
+    ctx.lineWidth = 0.5; ctx.stroke()
+  }
+
+  // Sun
+  const sunR = 4.5 + 0.5 * Math.sin(st.sunPulse)
+  const flareExtra = st.clickFlare > 0 ? st.clickFlare * 1.2 : 0
+  const sunGrad = ctx.createRadialGradient(CX, CY, 0, CX, CY, sunR + 8 + flareExtra)
+  sunGrad.addColorStop(0,    "rgba(255,240,120,1)")
+  sunGrad.addColorStop(0.35, "rgba(255,180,40,0.9)")
+  sunGrad.addColorStop(0.7,  "rgba(255,100,20,0.35)")
+  sunGrad.addColorStop(1,    "rgba(255,80,0,0)")
+  ctx.beginPath(); ctx.arc(CX, CY, sunR + 8 + flareExtra, 0, Math.PI * 2)
+  ctx.fillStyle = sunGrad; ctx.fill()
+
+  ctx.beginPath(); ctx.arc(CX, CY, sunR, 0, Math.PI * 2)
+  ctx.fillStyle = "rgba(255,240,120,1)"
+  ctx.shadowBlur = 10; ctx.shadowColor = "rgba(255,160,40,0.9)"
+  ctx.fill(); ctx.shadowBlur = 0
+
+  // Planets + trails
+  for (const p of st.planets) {
+    p.angle += p.speed * speedMult
+    const px = CX + Math.cos(p.angle) * p.orbitR
+    const py = CY + Math.sin(p.angle) * p.orbitR
+
+    // Trail
+    p.trail.push({ x: px, y: py })
+    if (p.trail.length > 14) p.trail.shift()
+    for (let i = 0; i < p.trail.length; i++) {
+      const a = (i / p.trail.length) * 0.35
+      ctx.beginPath(); ctx.arc(p.trail[i].x, p.trail[i].y, p.r * 0.5, 0, Math.PI * 2)
+      ctx.fillStyle = `rgba(${p.color},${a})`; ctx.fill()
+    }
+
+    // Planet body
+    const pGrad = ctx.createRadialGradient(px - p.r * 0.3, py - p.r * 0.3, 0, px, py, p.r)
+    pGrad.addColorStop(0, `rgba(${p.color},1)`)
+    pGrad.addColorStop(1, `rgba(${p.color},0.5)`)
+    ctx.beginPath(); ctx.arc(px, py, p.r, 0, Math.PI * 2)
+    ctx.fillStyle = pGrad; ctx.fill()
+  }
+
+  // Saturn-style ring on planet 3
+  const p3 = st.planets[2]
+  const rx = CX + Math.cos(p3.angle) * p3.orbitR
+  const ry = CY + Math.sin(p3.angle) * p3.orbitR
+  ctx.save(); ctx.translate(rx, ry); ctx.scale(1, 0.38)
+  ctx.beginPath(); ctx.arc(0, 0, p3.r + 3.5, 0, Math.PI * 2)
+  ctx.strokeStyle = "rgba(200,140,80,0.55)"; ctx.lineWidth = 1.2; ctx.stroke()
+  ctx.restore()
+}
+
 // ── MAIN COMPONENT ────────────────────────────────────────────────────────────
 const HOVER_SEL =
   "button, a, .project-card, .tilt-card, .contact-link, .resume-btn, " +
@@ -270,14 +354,15 @@ export default function CursorSystem() {
   const prevClicked = useRef(false)
   const modeRef = useRef<CursorMode>("pulsar")
 
-  const pulsarSt     = useRef(initPulsar())
-  const lightsaberSt = useRef(initLightsaber())
-  const spaceshipSt  = useRef(initSpaceship())
-  const blackholeSt  = useRef(initBlackhole())
+  const pulsarSt      = useRef(initPulsar())
+  const lightsaberSt  = useRef(initLightsaber())
+  const spaceshipSt   = useRef(initSpaceship())
+  const blackholeSt   = useRef(initBlackhole())
+  const solarSystemSt = useRef(initSolarSystem())
 
   useEffect(() => {
     const saved = localStorage.getItem("protocol-cursor") as CursorMode | null
-    const valid: CursorMode[] = ["pulsar", "lightsaber", "spaceship", "blackhole"]
+    const valid: CursorMode[] = ["pulsar", "lightsaber", "spaceship", "blackhole", "solarsystem"]
     if (saved && valid.includes(saved)) {
       setMode(saved); modeRef.current = saved
     }
@@ -322,10 +407,11 @@ export default function CursorSystem() {
       prevClicked.current = isClicked.current
 
       const m = modeRef.current
-      if      (m === "pulsar")     drawPulsar(ctx, pulsarSt.current, isHovered.current, justClicked, vx.current, vy.current, now)
-      else if (m === "lightsaber") drawLightsaber(ctx, lightsaberSt.current, isHovered.current, justClicked, vx.current, vy.current)
-      else if (m === "spaceship")  drawSpaceship(ctx, spaceshipSt.current, isHovered.current, justClicked, vx.current, vy.current)
-      else if (m === "blackhole")  drawBlackhole(ctx, blackholeSt.current, isHovered.current, justClicked, now)
+      if      (m === "pulsar")      drawPulsar(ctx, pulsarSt.current, isHovered.current, justClicked, vx.current, vy.current, now)
+      else if (m === "lightsaber")  drawLightsaber(ctx, lightsaberSt.current, isHovered.current, justClicked, vx.current, vy.current)
+      else if (m === "spaceship")   drawSpaceship(ctx, spaceshipSt.current, isHovered.current, justClicked, vx.current, vy.current)
+      else if (m === "blackhole")   drawBlackhole(ctx, blackholeSt.current, isHovered.current, justClicked, now)
+      else if (m === "solarsystem") drawSolarSystem(ctx, solarSystemSt.current, isHovered.current, justClicked)
 
       animId = requestAnimationFrame(draw)
     }

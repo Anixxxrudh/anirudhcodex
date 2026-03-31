@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 
-type CursorMode = "pulsar" | "lightsaber" | "spaceship" | "blackhole"
+type CursorMode = "pulsar" | "lightsaber" | "spaceship" | "blackhole" | "solarsystem"
 
 type NavbarProps = {
   mode: string
@@ -19,10 +19,11 @@ const NAV_ITEMS = [
 ]
 
 const CURSOR_LIST: { id: CursorMode; label: string; icon: string }[] = [
-  { id: "pulsar",     label: "Pulsar",     icon: "◉" },
-  { id: "lightsaber", label: "Lightsaber", icon: "⟡" },
-  { id: "spaceship",  label: "Spaceship",  icon: "▲" },
-  { id: "blackhole",  label: "Blackhole",  icon: "◎" },
+  { id: "pulsar",      label: "Pulsar",       icon: "◉" },
+  { id: "lightsaber",  label: "Lightsaber",   icon: "⟡" },
+  { id: "spaceship",   label: "Spaceship",    icon: "▲" },
+  { id: "blackhole",   label: "Blackhole",    icon: "◎" },
+  { id: "solarsystem", label: "Solar System", icon: "🪐" },
 ]
 
 export default function Navbar({ mode, setMode, scrollToSection }: NavbarProps) {
