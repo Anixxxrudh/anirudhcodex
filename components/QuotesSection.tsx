@@ -190,10 +190,7 @@ export default function QuotesSection() {
   const [active, setActive] = useState(0)
   const [fading,  setFading]  = useState(false)
   const [floaters, setFloaters] = useState<FloatItem[]>([])
-  const timerRef   = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const canvasRef  = useRef<HTMLCanvasElement>(null)
-
-  useWormhole(canvasRef)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const goTo = (idx: number) => {
     if (idx === active) return
@@ -247,34 +244,28 @@ export default function QuotesSection() {
         ))}
       </div>
 
-      {/* Wormhole bubble */}
-      <div className="wormhole-bubble" aria-hidden="true">
-        {/* Animated wormhole canvas */}
-        <canvas ref={canvasRef} className="wormhole-canvas" />
-
-        {/* Floating quotes inside the bubble */}
-        <div className="quotes-float-field">
-          {floaters.map((f) => (
-            <div
-              key={f.id}
-              className="quote-floater"
-              style={{
-                left: `${f.x}%`,
-                top:  `${f.y}%`,
-                opacity: f.opacity,
-                fontSize: `${f.fontSize}rem`,
-                transform: `rotate(${f.rot}deg)`,
-                animationDuration: `${f.dur}s`,
-                animationDelay: `${f.delay}s`,
-                ["--drift-x" as string]: `${f.driftX}px`,
-                ["--drift-y" as string]: `${f.driftY}px`,
-              }}
-            >
-              <span className="qf-text">&ldquo;{f.text}&rdquo;</span>
-              <span className="qf-author">— {f.author}</span>
-            </div>
-          ))}
-        </div>
+      {/* Floating glass-bubble quotes */}
+      <div className="quotes-float-field" aria-hidden="true">
+        {floaters.map((f) => (
+          <div
+            key={f.id}
+            className="quote-floater"
+            style={{
+              left: `${f.x}%`,
+              top:  `${f.y}%`,
+              opacity: f.opacity,
+              fontSize: `${f.fontSize}rem`,
+              transform: `rotate(${f.rot}deg)`,
+              animationDuration: `${f.dur}s`,
+              animationDelay: `${f.delay}s`,
+              ["--drift-x" as string]: `${f.driftX}px`,
+              ["--drift-y" as string]: `${f.driftY}px`,
+            }}
+          >
+            <span className="qf-text">&ldquo;{f.text}&rdquo;</span>
+            <span className="qf-author">— {f.author}</span>
+          </div>
+        ))}
       </div>
 
     </section>
