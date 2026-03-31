@@ -70,12 +70,12 @@ export default function QuotesSection() {
       x: 4 + seededRand(i * 3) * 82,
       y: 52 + seededRand(i * 7) * 42,
       rot: (seededRand(i * 11) - 0.5) * 14,
-      dur: 18 + seededRand(i * 5) * 18,
-      delay: -(seededRand(i * 13) * 20),
+      dur: 10 + seededRand(i * 5) * 10,
+      delay: -(seededRand(i * 13) * 12),
       driftX: (seededRand(i * 17) - 0.5) * 60,
       driftY: (seededRand(i * 19) - 0.5) * 40,
-      opacity: 0.10 + seededRand(i * 23) * 0.14,
-      fontSize: 0.62 + seededRand(i * 29) * 0.22,
+      opacity: 0.32 + seededRand(i * 23) * 0.28,
+      fontSize: 0.82 + seededRand(i * 29) * 0.32,
     }))
     setFloaters(items)
   }, [])
