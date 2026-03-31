@@ -62,8 +62,6 @@ type Body = {
   idx: number        // index into allQuotesRef
 }
 
-interface Star { x: number; y: number; vx: number; vy: number; alpha: number; decay: number }
-
 // ── Physics helpers ───────────────────────────────────────────────────────────
 
 function setPos(b: Body) {
@@ -119,8 +117,6 @@ export default function QuotesSection() {
   const canvasRef    = useRef<HTMLCanvasElement>(null)
   const filterRef    = useRef<string | null>(null)
   const hoveredRef   = useRef<string | null>(null)
-  const starsRef     = useRef<Star[]>([])
-  const lastStarRef  = useRef<number>(0)
   const spawnIdxRef  = useRef<number>(0)
   const dragRef      = useRef<{
     bi: number; ox: number; oy: number
@@ -245,41 +241,6 @@ export default function QuotesSection() {
           }
         }
 
-        // Shooting stars
-        if (now - lastStarRef.current > 11000 + Math.random() * 8000) {
-          lastStarRef.current = now
-          // Always left-to-right at shallow angle
-          const yStart = ch * (0.05 + Math.random() * 0.6)
-          starsRef.current.push({
-            x: -20,
-            y: yStart,
-            vx: 3.5 + Math.random() * 2.5,
-            vy: 0.6 + Math.random() * 0.8,
-            alpha: 0.42, decay: 0.006 + Math.random() * 0.005,
-          })
-        }
-        starsRef.current = starsRef.current.filter(s => s.alpha > 0 && s.x < cw + 80)
-        for (const s of starsRef.current) {
-          s.x += s.vx; s.y += s.vy; s.alpha -= s.decay
-          const spd = Math.hypot(s.vx, s.vy)
-          const tailLen = 55 + spd * 14
-          const ang = Math.atan2(s.vy, s.vx)
-          const tx = s.x - Math.cos(ang) * tailLen
-          const ty = s.y - Math.sin(ang) * tailLen
-          const sg = ctx.createLinearGradient(tx, ty, s.x, s.y)
-          sg.addColorStop(0,    "rgba(255,255,255,0)")
-          sg.addColorStop(0.55, `rgba(210,228,255,${s.alpha * 0.18})`)
-          sg.addColorStop(0.85, `rgba(230,242,255,${s.alpha * 0.55})`)
-          sg.addColorStop(1,    `rgba(255,255,255,${s.alpha * 0.72})`)
-          ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(s.x, s.y)
-          ctx.strokeStyle = sg; ctx.lineWidth = 0.85; ctx.stroke()
-          // Tiny soft head glow only
-          const hg = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 2.5)
-          hg.addColorStop(0, `rgba(255,255,255,${s.alpha * 0.65})`)
-          hg.addColorStop(1, "rgba(255,255,255,0)")
-          ctx.beginPath(); ctx.arc(s.x, s.y, 2.5, 0, Math.PI * 2)
-          ctx.fillStyle = hg; ctx.fill()
-        }
 
         bods.forEach(setPos)
         animRef.current = requestAnimationFrame(tick)
