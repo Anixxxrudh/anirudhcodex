@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 
-type CursorMode = "pulsar" | "lightsaber" | "spaceship" | "blackhole" | "solarsystem"
+type CursorMode = "pulsar" | "lightsaber" | "spaceship" | "blackhole" | "whitehole" | "solarsystem"
 
 type NavbarProps = {
   mode: string
@@ -22,7 +22,8 @@ const CURSOR_LIST: { id: CursorMode; label: string; icon: string }[] = [
   { id: "pulsar",      label: "Pulsar",       icon: "◉" },
   { id: "lightsaber",  label: "Lightsaber",   icon: "⟡" },
   { id: "spaceship",   label: "Spaceship",    icon: "▲" },
-  { id: "blackhole",   label: "Blackhole",    icon: "◎" },
+  { id: "blackhole",   label: "Black Hole",   icon: "◎" },
+  { id: "whitehole",   label: "White Hole",   icon: "◉" },
   { id: "solarsystem", label: "Solar System", icon: "🪐" },
 ]
 
@@ -33,7 +34,7 @@ export default function Navbar({ mode, setMode, scrollToSection }: NavbarProps) 
 
   useEffect(() => {
     const saved = localStorage.getItem("protocol-cursor") as CursorMode | null
-    const valid: CursorMode[] = ["pulsar", "lightsaber", "spaceship", "blackhole"]
+    const valid: CursorMode[] = ["pulsar", "lightsaber", "spaceship", "blackhole", "whitehole", "solarsystem"]
     if (saved && valid.includes(saved)) setCursorMode(saved)
   }, [])
 

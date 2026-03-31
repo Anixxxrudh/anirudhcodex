@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useRef, useState } from "react"
 
-export type CursorMode = "pulsar" | "lightsaber" | "spaceship" | "blackhole" | "solarsystem"
+export type CursorMode = "pulsar" | "lightsaber" | "spaceship" | "blackhole" | "whitehole" | "solarsystem"
 
 const W = 80
 const CX = 40
@@ -254,6 +254,76 @@ function drawBlackhole(
   ctx.fillStyle = "rgba(255,255,255,0.5)"; ctx.fill()
 }
 
+// ── WHITE HOLE ────────────────────────────────────────────────────────────────
+interface WHRing { t0: number; maxR: number; dur: number }
+interface WhiteholeState { rings: WHRing[]; pulse: number; lastEmit: number; clickFlash: number }
+function initWhitehole(): WhiteholeState { return { rings: [], pulse: 0, lastEmit: 0, clickFlash: 0 } }
+
+function drawWhitehole(
+  ctx: CanvasRenderingContext2D,
+  st: WhiteholeState,
+  hovered: boolean, justClicked: boolean,
+  now: number
+) {
+  ctx.clearRect(0, 0, W, W)
+  st.pulse += 0.07
+  const rate = hovered ? 260 : 560
+  if (now - st.lastEmit > rate) {
+    st.rings.push({ t0: now, maxR: 34, dur: 950 })
+    st.lastEmit = now
+  }
+  if (justClicked) {
+    st.clickFlash = 10
+    for (let i = 0; i < 4; i++) st.rings.push({ t0: now - i * 55, maxR: 50, dur: 720 })
+  }
+  if (st.clickFlash > 0) st.clickFlash--
+  st.rings = st.rings.filter(r => now - r.t0 < r.dur)
+
+  // Expanding rings
+  for (const ring of st.rings) {
+    const t = (now - ring.t0) / ring.dur
+    const r = ring.maxR * t
+    const op = (1 - t) * (hovered ? 0.75 : 0.5)
+    ctx.beginPath(); ctx.arc(CX, CY, r, 0, Math.PI * 2)
+    ctx.strokeStyle = `rgba(215,240,255,${op})`
+    ctx.lineWidth = 1.8 * (1 - t * 0.6); ctx.stroke()
+  }
+
+  const coreR = 5 + 1.3 * Math.sin(st.pulse * 2.5)
+  const flare = st.clickFlash > 0 ? st.clickFlash * 2.2 : 0
+
+  // Outer glow corona
+  const glowR = coreR + 15 + flare
+  const glow = ctx.createRadialGradient(CX, CY, 0, CX, CY, glowR)
+  glow.addColorStop(0,    "rgba(255,255,255,0.95)")
+  glow.addColorStop(0.28, "rgba(200,228,255,0.68)")
+  glow.addColorStop(0.58, "rgba(120,195,255,0.22)")
+  glow.addColorStop(1,    "rgba(77,184,255,0)")
+  ctx.beginPath(); ctx.arc(CX, CY, glowR, 0, Math.PI * 2)
+  ctx.fillStyle = glow; ctx.fill()
+
+  // Hard bright center
+  ctx.beginPath(); ctx.arc(CX, CY, coreR, 0, Math.PI * 2)
+  ctx.fillStyle = "rgba(255,255,255,1)"
+  ctx.shadowBlur = hovered ? 22 : 14
+  ctx.shadowColor = "rgba(180,230,255,1)"
+  ctx.fill(); ctx.shadowBlur = 0
+}
+
+// ── GRAVITATIONAL FIELD PARTICLES ─────────────────────────────────────────────
+interface GravParticle { x: number; y: number; vx: number; vy: number; alpha: number; size: number }
+
+function makeGravParticles(count: number): GravParticle[] {
+  return Array.from({ length: count }, () => ({
+    x: Math.random() * (window.innerWidth || 1400),
+    y: Math.random() * (window.innerHeight || 900),
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: (Math.random() - 0.5) * 0.4,
+    alpha: 0.2 + Math.random() * 0.55,
+    size: 0.7 + Math.random() * 1.3,
+  }))
+}
+
 // ── SOLAR SYSTEM ──────────────────────────────────────────────────────────────
 interface SSPlanet { orbitR: number; angle: number; speed: number; r: number; color: string; trail: { x: number; y: number }[] }
 interface SolarSystemState { planets: SSPlanet[]; sunPulse: number; clickFlare: number }
@@ -358,11 +428,14 @@ export default function CursorSystem() {
   const lightsaberSt  = useRef(initLightsaber())
   const spaceshipSt   = useRef(initSpaceship())
   const blackholeSt   = useRef(initBlackhole())
+  const whiteHoleSt   = useRef(initWhitehole())
   const solarSystemSt = useRef(initSolarSystem())
+  const fieldCanvasRef = useRef<HTMLCanvasElement>(null)
+  const gravParticles  = useRef<GravParticle[]>([])
 
   useEffect(() => {
     const saved = localStorage.getItem("protocol-cursor") as CursorMode | null
-    const valid: CursorMode[] = ["pulsar", "lightsaber", "spaceship", "blackhole", "solarsystem"]
+    const valid: CursorMode[] = ["pulsar", "lightsaber", "spaceship", "blackhole", "whitehole", "solarsystem"]
     if (saved && valid.includes(saved)) {
       setMode(saved); modeRef.current = saved
     }
@@ -375,6 +448,10 @@ export default function CursorSystem() {
     }
     window.addEventListener("cursor-change", onCursorChange)
     return () => window.removeEventListener("cursor-change", onCursorChange)
+  }, [])
+
+  useEffect(() => {
+    gravParticles.current = makeGravParticles(90)
   }, [])
 
   useEffect(() => {
@@ -411,7 +488,85 @@ export default function CursorSystem() {
       else if (m === "lightsaber")  drawLightsaber(ctx, lightsaberSt.current, isHovered.current, justClicked, vx.current, vy.current)
       else if (m === "spaceship")   drawSpaceship(ctx, spaceshipSt.current, isHovered.current, justClicked, vx.current, vy.current)
       else if (m === "blackhole")   drawBlackhole(ctx, blackholeSt.current, isHovered.current, justClicked, now)
+      else if (m === "whitehole")   drawWhitehole(ctx, whiteHoleSt.current, isHovered.current, justClicked, now)
       else if (m === "solarsystem") drawSolarSystem(ctx, solarSystemSt.current, isHovered.current, justClicked)
+
+      // ── Gravitational field canvas ──────────────────────────────────────
+      const fcv = fieldCanvasRef.current
+      if (fcv) {
+        const fctx = fcv.getContext("2d")!
+        const vw = window.innerWidth, vh = window.innerHeight
+        if (fcv.width !== vw || fcv.height !== vh) { fcv.width = vw; fcv.height = vh }
+
+        if (m === "blackhole" || m === "whitehole") {
+          fctx.clearRect(0, 0, vw, vh)
+          const cx = mx.current, cy = my.current
+          const pull = m === "blackhole"
+          const particles = gravParticles.current
+
+          for (const p of particles) {
+            const dx = cx - p.x, dy = cy - p.y
+            const dist = Math.hypot(dx, dy) || 1
+
+            if (pull) {
+              // Gravity pull toward cursor
+              const force = Math.min(5500 / (dist * dist), 3.2)
+              p.vx += (dx / dist) * force * 0.016
+              p.vy += (dy / dist) * force * 0.016
+              p.vx *= 0.972; p.vy *= 0.972
+              // Consumed — respawn at random edge
+              if (dist < 16) {
+                p.x = Math.random() * vw; p.y = Math.random() * vh
+                p.vx = (Math.random() - 0.5) * 0.4
+                p.vy = (Math.random() - 0.5) * 0.4
+                p.alpha = 0.15 + Math.random() * 0.4
+              }
+            } else {
+              // Repulsion away from cursor
+              const rdx = p.x - cx, rdy = p.y - cy
+              const rd = Math.hypot(rdx, rdy) || 1
+              const force = Math.min(6000 / (rd * rd + 60), 4)
+              p.vx += (rdx / rd) * force * 0.016
+              p.vy += (rdy / rd) * force * 0.016
+              p.vx *= 0.965; p.vy *= 0.965
+              // Flew off screen — respawn near cursor
+              if (p.x < -60 || p.x > vw + 60 || p.y < -60 || p.y > vh + 60) {
+                const ang = Math.random() * Math.PI * 2
+                const d = 12 + Math.random() * 22
+                p.x = cx + Math.cos(ang) * d; p.y = cy + Math.sin(ang) * d
+                p.vx = 0; p.vy = 0
+                p.alpha = 0.4 + Math.random() * 0.5
+              }
+            }
+
+            p.x += p.vx; p.y += p.vy
+
+            // Brightness boost when close (black hole) or near spawn (white hole)
+            const distFactor = pull ? Math.min(1, 160 / (dist + 8)) : 1
+            const a = Math.min(p.alpha * (0.5 + distFactor * 0.7), 0.9)
+
+            // Core dot
+            fctx.beginPath()
+            fctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+            fctx.fillStyle = pull
+              ? `rgba(100,190,255,${a})`
+              : `rgba(220,240,255,${a})`
+            fctx.fill()
+
+            // Soft glow halo for brighter particles
+            if (a > 0.38) {
+              fctx.beginPath()
+              fctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2)
+              fctx.fillStyle = pull
+                ? `rgba(77,160,255,${a * 0.12})`
+                : `rgba(200,230,255,${a * 0.12})`
+              fctx.fill()
+            }
+          }
+        } else {
+          fctx.clearRect(0, 0, vw, vh)
+        }
+      }
 
       animId = requestAnimationFrame(draw)
     }
@@ -429,18 +584,33 @@ export default function CursorSystem() {
   }, [])
 
   return (
-    <canvas
-      ref={canvasRef}
-      id="protocol-cursor"
-      width={W}
-      height={W}
-      style={{
-        position: "fixed",
-        pointerEvents: "none",
-        zIndex: 9999,
-        left: "-999px",
-        top: "-999px",
-      }}
-    />
+    <>
+      {/* Full-screen gravitational field layer */}
+      <canvas
+        ref={fieldCanvasRef}
+        style={{
+          position: "fixed",
+          inset: 0,
+          width: "100vw",
+          height: "100vh",
+          pointerEvents: "none",
+          zIndex: 9998,
+        }}
+      />
+      {/* Cursor canvas */}
+      <canvas
+        ref={canvasRef}
+        id="protocol-cursor"
+        width={W}
+        height={W}
+        style={{
+          position: "fixed",
+          pointerEvents: "none",
+          zIndex: 9999,
+          left: "-999px",
+          top: "-999px",
+        }}
+      />
+    </>
   )
 }
