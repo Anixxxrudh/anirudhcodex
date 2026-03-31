@@ -3,12 +3,6 @@ import { useEffect, useRef, useState } from "react"
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
-const HERO_QUOTES = [
-  { text: "The most beautiful thing we can experience is the mysterious. It is the source of all true art and science.", author: "Albert Einstein" },
-  { text: "Research is to see what everybody else has seen, and to think what nobody else has thought.", author: "Albert Szent-Györgyi" },
-  { text: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin" },
-]
-
 interface FQ { text: string; author: string; bio: string; size: number }
 
 const ALL_FLOAT_QUOTES: FQ[] = [
@@ -41,6 +35,21 @@ const SPAWN_POOL: FQ[] = [
 ]
 
 const UNIQUE_AUTHORS = [...new Set(ALL_FLOAT_QUOTES.map(q => q.author))].sort()
+
+// Color per author — consistent across renders
+const AUTHOR_COLORS: Record<string, string> = {
+  "Albert Einstein":    "#f0c040",
+  "Carl Sagan":         "#4db8ff",
+  "Stephen Hawking":    "#b87aff",
+  "Neil deGrasse Tyson":"#40e0d0",
+  "Werner Heisenberg":  "#ff6eb4",
+  "Nikola Tesla":       "#ff8c42",
+  "Ernest Rutherford":  "#7ed957",
+  "Edwin Hubble":       "#5fd4f4",
+  "Antoine Lavoisier":  "#ffcc66",
+}
+const authorColor = (a: string) => AUTHOR_COLORS[a] ?? "#aaa"
+const authorInitials = (a: string) => a.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -99,9 +108,7 @@ function collidePairs(bods: Body[]) {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function QuotesSection() {
-  const [heroActive, setHeroActive] = useState(0)
-  const [heroFading, setHeroFading] = useState(false)
-  const [expanded,   setExpanded]   = useState<FQ | null>(null)
+  const [expanded, setExpanded] = useState<FQ | null>(null)
   const [filter,     setFilter]     = useState<string | null>(null)
   const [allQuotes,  setAllQuotes]  = useState<FQ[]>(ALL_FLOAT_QUOTES)
 
@@ -123,14 +130,6 @@ export default function QuotesSection() {
   // Sync refs
   useEffect(() => { filterRef.current = filter }, [filter])
 
-  // Hero quote rotation
-  useEffect(() => {
-    const t = setInterval(() => {
-      setHeroFading(true)
-      setTimeout(() => { setHeroActive(a => (a + 1) % HERO_QUOTES.length); setHeroFading(false) }, 300)
-    }, 8000)
-    return () => clearInterval(t)
-  }, [])
 
   // ── Physics + canvas loop ────────────────────────────────────────────────
   useEffect(() => {
@@ -324,28 +323,56 @@ export default function QuotesSection() {
     if (!d.moved) setExpanded(q)
   }
 
-  const q = HERO_QUOTES[heroActive]
-
   return (
     <section className="quotes-section snap-section">
 
-      {/* Filter bar */}
-      <div className="quotes-filter-bar">
-        <button className={`qf-btn${!filter ? " qf-btn--active" : ""}`} onClick={() => setFilter(null)}>All</button>
-        {UNIQUE_AUTHORS.map(a => (
-          <button key={a} className={`qf-btn${filter === a ? " qf-btn--active" : ""}`} onClick={() => setFilter(f => f === a ? null : a)}>{a}</button>
-        ))}
-      </div>
+      {/* Scientist selector */}
+      <div className="sci-selector">
+        <div className="section-eyebrow" style={{ marginBottom: 16 }}>Voices of Science</div>
+        <div className="sci-nodes">
+          {/* All button */}
+          <button
+            className={`sci-node${!filter ? " sci-node--active" : ""}`}
+            onClick={() => setFilter(null)}
+            style={{ ["--sci-color" as string]: "rgba(255,255,255,0.7)" }}
+          >
+            <span className="sci-orb">✦</span>
+            <span className="sci-name">All</span>
+          </button>
 
-      {/* Hero rotating quote */}
-      <div className="quote-text" style={{ opacity: heroFading ? 0 : 1 }}>&ldquo;{q.text}&rdquo;</div>
-      <div className="quote-author" style={{ opacity: heroFading ? 0 : 1, transition: "opacity 0.3s ease" }}>— {q.author}</div>
-      <div className="quote-dots">
-        {HERO_QUOTES.map((_, i) => (
-          <button key={i} className={`quote-dot${heroActive === i ? " active" : ""}`}
-            onClick={() => { setHeroFading(true); setTimeout(() => { setHeroActive(i); setHeroFading(false) }, 300) }}
-            aria-label={`Quote ${i + 1}`} />
-        ))}
+          {UNIQUE_AUTHORS.map(a => {
+            const count = allQuotes.filter(q => q.author === a).length
+            const color = authorColor(a)
+            const active = filter === a
+            const orbSize = 28 + count * 4
+            return (
+              <button
+                key={a}
+                className={`sci-node${active ? " sci-node--active" : ""}`}
+                onClick={() => setFilter(f => f === a ? null : a)}
+                style={{ ["--sci-color" as string]: color }}
+              >
+                <span
+                  className="sci-orb"
+                  style={{
+                    width: orbSize, height: orbSize,
+                    fontSize: orbSize * 0.36,
+                    background: `radial-gradient(circle at 35% 35%, ${color}33, ${color}11)`,
+                    borderColor: active ? color : `${color}55`,
+                    boxShadow: active
+                      ? `0 0 16px ${color}88, 0 0 6px ${color}55, inset 0 1px 0 ${color}33`
+                      : `0 0 8px ${color}33`,
+                    color,
+                  }}
+                >
+                  {authorInitials(a)}
+                </span>
+                <span className="sci-name" style={{ color: active ? color : undefined }}>{a.split(" ").slice(-1)[0]}</span>
+                <span className="sci-count">{count}</span>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* Physics field */}

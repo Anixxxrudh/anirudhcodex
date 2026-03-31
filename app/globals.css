@@ -2389,6 +2389,70 @@ section {
 .qf-btn:hover { border-color: rgba(77,184,255,0.5); color: rgba(255,255,255,0.8); }
 .qf-btn--active { border-color: #4db8ff; color: #4db8ff; background: rgba(77,184,255,0.10); }
 
+/* ── Scientist selector ─────────────────────────────────────────────── */
+.sci-selector {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+}
+.sci-nodes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 18px;
+  justify-content: center;
+  align-items: flex-end;
+}
+.sci-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: none;
+  padding: 0;
+  outline: none;
+  transition: transform 0.2s ease;
+}
+.sci-node:hover { transform: translateY(-2px); }
+.sci-orb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.18);
+  font-weight: 700;
+  font-family: var(--font-display);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+  width: 36px;
+  height: 36px;
+  font-size: 0.55rem;
+}
+.sci-node--active .sci-orb {
+  transform: scale(1.18);
+}
+.sci-name {
+  font-family: var(--font-display);
+  font-size: 0.44rem;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+.sci-node--active .sci-name,
+.sci-node:hover .sci-name { color: rgba(255,255,255,0.8); }
+.sci-count {
+  font-size: 0.38rem;
+  color: rgba(255,255,255,0.25);
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+}
+
 /* ── Float field ────────────────────────────────────────────────────── */
 .quotes-float-field {
   position: absolute;
