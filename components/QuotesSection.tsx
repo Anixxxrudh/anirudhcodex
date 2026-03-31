@@ -103,6 +103,27 @@ function collidePairs(bods: Body[]) {
   }
 }
 
+// Bounce circles off an AABB (with padding)
+function boxBounce(bods: Body[], rx: number, ry: number, rw: number, rh: number, pad = 10) {
+  const x0 = rx - pad, y0 = ry - pad, x1 = rx + rw + pad, y1 = ry + rh + pad
+  for (const b of bods) {
+    if (b.spawning < 0.5) continue
+    // nearest point on padded rect to bubble center
+    const cx = Math.max(x0, Math.min(x1, b.x))
+    const cy = Math.max(y0, Math.min(y1, b.y))
+    const dx = b.x - cx, dy = b.y - cy
+    const dist = Math.hypot(dx, dy) || 0.001
+    if (dist >= b.r) continue
+    const nx = dx / dist, ny = dy / dist
+    // push out
+    b.x = cx + nx * b.r
+    b.y = cy + ny * b.r
+    // reflect velocity
+    const dot = b.vx * nx + b.vy * ny
+    if (dot < 0) { b.vx -= 2 * dot * nx; b.vy -= 2 * dot * ny }
+  }
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function QuotesSection() {
@@ -118,6 +139,7 @@ export default function QuotesSection() {
   const filterRef    = useRef<string | null>(null)
   const hoveredRef   = useRef<string | null>(null)
   const spawnIdxRef  = useRef<number>(0)
+  const selectorRef  = useRef<HTMLDivElement>(null)
   const dragRef      = useRef<{
     bi: number; ox: number; oy: number
     lx: number; ly: number; lvx: number; lvy: number; moved: boolean
@@ -157,8 +179,18 @@ export default function QuotesSection() {
         }
       }).filter((b): b is Body => b !== null)
 
-      // Settle
-      for (let s = 0; s < 80; s++) { wallBounce(bodiesRef.current, CW, CH); collidePairs(bodiesRef.current) }
+      // Settle (push bubbles out of selector box too)
+      const sel = selectorRef.current
+      const selRect = sel ? (() => {
+        const sr = sel.getBoundingClientRect()
+        const cr = container.getBoundingClientRect()
+        return { x: sr.left - cr.left, y: sr.top - cr.top, w: sr.width, h: sr.height }
+      })() : null
+      for (let s = 0; s < 80; s++) {
+        wallBounce(bodiesRef.current, CW, CH)
+        collidePairs(bodiesRef.current)
+        if (selRect) boxBounce(bodiesRef.current, selRect.x, selRect.y, selRect.w, selRect.h)
+      }
       bodiesRef.current.forEach(setPos)
 
       cancelAnimationFrame(animRef.current)
@@ -184,6 +216,14 @@ export default function QuotesSection() {
 
         wallBounce(bods, cw, ch)
         collidePairs(bods)
+
+        // Bounce off scientist selector box
+        const sel = selectorRef.current
+        if (sel) {
+          const sr = sel.getBoundingClientRect()
+          const cr = container.getBoundingClientRect()
+          boxBounce(bods, sr.left - cr.left, sr.top - cr.top, sr.width, sr.height)
+        }
 
         // Trails
         frame++
@@ -296,7 +336,7 @@ export default function QuotesSection() {
     <section className="quotes-section snap-section">
 
       {/* Scientist selector */}
-      <div className="sci-selector">
+      <div ref={selectorRef} className="sci-selector">
         <div className="section-eyebrow" style={{ marginBottom: 16 }}>Voices of Science</div>
         <div className="sci-nodes">
           {/* All button */}
