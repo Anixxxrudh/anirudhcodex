@@ -607,10 +607,7 @@ section {
 
 /* ── Section title gradient per mode ────────────────────────────────── */
 .mode-physics .section-title {
-  background: linear-gradient(135deg, #fff 30%, #00e5ff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #fff;
 }
 .mode-music .section-title {
   background: linear-gradient(135deg, #fff 30%, #4db8ff 100%);
