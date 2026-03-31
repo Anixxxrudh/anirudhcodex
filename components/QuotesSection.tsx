@@ -1,172 +1,75 @@
 "use client"
 import { useEffect, useRef, useState } from "react"
 
-const QUOTES = [
-  {
-    text: "The most beautiful thing we can experience is the mysterious. It is the source of all true art and science.",
-    author: "Albert Einstein",
-  },
-  {
-    text: "Research is to see what everybody else has seen, and to think what nobody else has thought.",
-    author: "Albert Szent-Györgyi",
-  },
-  {
-    text: "An investment in knowledge pays the best interest.",
-    author: "Benjamin Franklin",
-  },
+// ── Data ──────────────────────────────────────────────────────────────────────
+
+const HERO_QUOTES = [
+  { text: "The most beautiful thing we can experience is the mysterious. It is the source of all true art and science.", author: "Albert Einstein" },
+  { text: "Research is to see what everybody else has seen, and to think what nobody else has thought.", author: "Albert Szent-Györgyi" },
+  { text: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin" },
 ]
 
-const FLOAT_QUOTES = [
-  { text: "The cosmos is within us. We are made of star-stuff.", author: "Carl Sagan" },
-  { text: "Not only is the universe stranger than we think, it is stranger than we can think.", author: "Heisenberg" },
-  { text: "Physics is the only real science. The rest are just stamp collecting.", author: "Rutherford" },
-  { text: "The important thing is to not stop questioning.", author: "Einstein" },
-  { text: "In the middle of difficulty lies opportunity.", author: "Einstein" },
-  { text: "Look up at the stars and not down at your feet.", author: "Hawking" },
-  { text: "The universe is under no obligation to make sense to you.", author: "Neil deGrasse Tyson" },
-  { text: "We are a way for the cosmos to know itself.", author: "Carl Sagan" },
-  { text: "Science is a way of thinking much more than it is a body of knowledge.", author: "Carl Sagan" },
-  { text: "The good thing about science is that it's true whether or not you believe in it.", author: "Neil deGrasse Tyson" },
-  { text: "Somewhere, something incredible is waiting to be known.", author: "Carl Sagan" },
-  { text: "Equipped with his five senses, man explores the universe around him.", author: "Edwin Hubble" },
-  { text: "The nitrogen in our DNA, the calcium in our teeth — we are stardust.", author: "Carl Sagan" },
-  { text: "Energy cannot be created or destroyed, only transformed.", author: "Lavoisier" },
-  { text: "If you want to find the secrets of the universe, think in terms of energy.", author: "Tesla" },
-  { text: "Black holes are where God divided by zero.", author: "Steven Wright" },
-  { text: "The universe is not required to be in perfect harmony with human ambition.", author: "Carl Sagan" },
-  { text: "Two things are infinite: the universe and human stupidity.", author: "Einstein" },
+interface FQ { text: string; author: string; bio: string; size: number }
+
+const ALL_FLOAT_QUOTES: FQ[] = [
+  { text: "The cosmos is within us. We are made of star-stuff.", author: "Carl Sagan", bio: "Astronomer, author of Cosmos, and science communicator who brought the universe to millions.", size: 1.35 },
+  { text: "Somewhere, something incredible is waiting to be known.", author: "Carl Sagan", bio: "Astronomer, author of Cosmos, and science communicator who brought the universe to millions.", size: 1.2 },
+  { text: "We are a way for the cosmos to know itself.", author: "Carl Sagan", bio: "Astronomer, author of Cosmos, and science communicator who brought the universe to millions.", size: 1.1 },
+  { text: "Science is a way of thinking much more than it is a body of knowledge.", author: "Carl Sagan", bio: "Astronomer, author of Cosmos, and science communicator who brought the universe to millions.", size: 1.0 },
+  { text: "The important thing is to not stop questioning.", author: "Albert Einstein", bio: "Theoretical physicist. Special & General Relativity, E=mc², Nobel Prize 1921.", size: 1.3 },
+  { text: "Imagination is more important than knowledge.", author: "Albert Einstein", bio: "Theoretical physicist. Special & General Relativity, E=mc², Nobel Prize 1921.", size: 1.4 },
+  { text: "Two things are infinite: the universe and human stupidity.", author: "Albert Einstein", bio: "Theoretical physicist. Special & General Relativity, E=mc², Nobel Prize 1921.", size: 1.15 },
+  { text: "Look up at the stars and not down at your feet.", author: "Stephen Hawking", bio: "Theoretical physicist, cosmologist. Author of A Brief History of Time.", size: 1.3 },
+  { text: "Black holes are where God divided by zero.", author: "Stephen Hawking", bio: "Theoretical physicist, cosmologist. Author of A Brief History of Time.", size: 1.1 },
+  { text: "The universe is under no obligation to make sense to you.", author: "Neil deGrasse Tyson", bio: "Astrophysicist and director of the Hayden Planetarium. Host of StarTalk.", size: 1.2 },
+  { text: "The good thing about science is that it's true whether or not you believe in it.", author: "Neil deGrasse Tyson", bio: "Astrophysicist and director of the Hayden Planetarium. Host of StarTalk.", size: 1.1 },
+  { text: "Not only is the universe stranger than we think, it is stranger than we can think.", author: "Werner Heisenberg", bio: "Pioneer of quantum mechanics. Formulated the uncertainty principle.", size: 1.15 },
+  { text: "If you want to find the secrets of the universe, think in terms of energy.", author: "Nikola Tesla", bio: "Inventor and engineer who developed AC electricity systems.", size: 1.1 },
+  { text: "The nitrogen in our DNA, the calcium in our teeth — we are stardust.", author: "Carl Sagan", bio: "Astronomer, author of Cosmos, and science communicator who brought the universe to millions.", size: 0.95 },
+  { text: "Physics is the only real science. The rest are just stamp collecting.", author: "Ernest Rutherford", bio: "Physicist who discovered the nucleus of the atom. Nobel Prize 1908.", size: 1.0 },
+  { text: "In the middle of difficulty lies opportunity.", author: "Albert Einstein", bio: "Theoretical physicist. Special & General Relativity, E=mc², Nobel Prize 1921.", size: 0.9 },
+  { text: "Equipped with his five senses, man explores the universe around him.", author: "Edwin Hubble", bio: "Astronomer who proved galaxies exist beyond the Milky Way. Hubble's Law.", size: 1.0 },
+  { text: "Energy cannot be created or destroyed, only transformed.", author: "Antoine Lavoisier", bio: "Father of modern chemistry. Conservation of mass.", size: 0.9 },
 ]
+
+// Extra quotes that spawn in every 30s
+const SPAWN_POOL: FQ[] = [
+  { text: "The electron is not as simple as it looks.", author: "W.L. Bragg", bio: "Physicist, Nobel Prize 1915 for X-ray crystallography.", size: 0.9 },
+  { text: "An experiment is a question which science poses to Nature.", author: "Max Planck", bio: "Originator of quantum theory. Nobel Prize 1918.", size: 1.0 },
+  { text: "Everything existing in the universe is the fruit of chance and necessity.", author: "Democritus", bio: "Ancient Greek philosopher who proposed the concept of atoms.", size: 0.9 },
+  { text: "The most exciting phrase in science is not Eureka! but That's funny…", author: "Isaac Asimov", bio: "Prolific science fiction author and biochemistry professor.", size: 1.0 },
+]
+
+const UNIQUE_AUTHORS = [...new Set(ALL_FLOAT_QUOTES.map(q => q.author))].sort()
+
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 type Body = {
   el: HTMLDivElement | null
-  x: number; y: number   // center
-  vx: number; vy: number
-  r: number              // collision radius
-  w: number; h: number
+  x: number; y: number; vx: number; vy: number
+  r: number; w: number; h: number
+  trail: { x: number; y: number }[]
+  spawning: number   // 0→1 birth animation
+  idx: number        // index into allQuotesRef
 }
 
-export default function QuotesSection() {
-  const [active, setActive] = useState(0)
-  const [fading, setFading] = useState(false)
-  const timerRef     = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const elRefs       = useRef<(HTMLDivElement | null)[]>([])
-  const bodiesRef    = useRef<Body[]>([])
-  const animRef      = useRef<number>(0)
+interface Star { x: number; y: number; vx: number; vy: number; alpha: number; decay: number }
 
-  const goTo = (idx: number) => {
-    if (idx === active) return
-    setFading(true)
-    setTimeout(() => { setActive(idx); setFading(false) }, 300)
-  }
-
-  useEffect(() => {
-    timerRef.current = setInterval(() => {
-      setFading(true)
-      setTimeout(() => { setActive((a) => (a + 1) % QUOTES.length); setFading(false) }, 300)
-    }, 5000)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [])
-
-  // ── Physics loop ───────────────────────────────────────────────────────────
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    // Wait one frame for elements to paint and get real dimensions
-    const init = () => {
-      const CW = container.offsetWidth
-      const CH = container.offsetHeight
-
-      bodiesRef.current = elRefs.current.map((el, i) => {
-        if (!el) return null
-        const w = el.offsetWidth
-        const h = el.offsetHeight
-        // Collision radius: just outside the pill shape
-        const r = (w + h) / 4 + 6
-        // Spread evenly with some determinism, avoid edges
-        const angle = (i / FLOAT_QUOTES.length) * Math.PI * 2
-        const spread = 0.3 + (i % 3) * 0.15
-        const x = CW / 2 + Math.cos(angle) * CW * spread * 0.38
-        const y = CH / 2 + Math.sin(angle) * CH * spread * 0.38
-        const speed = 0.28 + (i % 5) * 0.06
-        const vAngle = angle + Math.PI * 0.5 + (i % 2 === 0 ? 0.3 : -0.3)
-        return { el, x, y, vx: Math.cos(vAngle) * speed, vy: Math.sin(vAngle) * speed, r, w, h }
-      }).filter((b): b is Body => b !== null)
-
-      // Run 60 separation steps so initial placement is clean
-      for (let step = 0; step < 60; step++) separateBodies(bodiesRef.current, CW, CH)
-
-      // Flush initial positions to DOM
-      for (const b of bodiesRef.current) setPos(b)
-
-      // Start animation
-      cancelAnimationFrame(animRef.current)
-      const tick = () => {
-        const cw = container.offsetWidth
-        const ch = container.offsetHeight
-        const bods = bodiesRef.current
-
-        for (const b of bods) { b.x += b.vx; b.y += b.vy }
-        wallBounce(bods, cw, ch)
-        collidePairs(bods)
-        for (const b of bods) setPos(b)
-
-        animRef.current = requestAnimationFrame(tick)
-      }
-      animRef.current = requestAnimationFrame(tick)
-    }
-
-    // Small delay so the browser has rendered the elements
-    const t = setTimeout(init, 80)
-    return () => { clearTimeout(t); cancelAnimationFrame(animRef.current) }
-  }, [])
-
-  return (
-    <section className="quotes-section snap-section">
-      {/* Main rotating quote */}
-      <div className="quote-text" style={{ opacity: fading ? 0 : 1 }}>
-        &ldquo;{QUOTES[active].text}&rdquo;
-      </div>
-      <div className="quote-author" style={{ opacity: fading ? 0 : 1, transition: "opacity 0.3s ease" }}>
-        — {QUOTES[active].author}
-      </div>
-      <div className="quote-dots">
-        {QUOTES.map((_, i) => (
-          <button key={i} className={`quote-dot${active === i ? " active" : ""}`}
-            onClick={() => goTo(i)} aria-label={`Quote ${i + 1}`} />
-        ))}
-      </div>
-
-      {/* Physics field */}
-      <div ref={containerRef} className="quotes-float-field" aria-hidden="true">
-        {FLOAT_QUOTES.map((q, i) => (
-          <div
-            key={i}
-            ref={(el) => { elRefs.current[i] = el }}
-            className="quote-floater"
-          >
-            <span className="qf-text">&ldquo;{q.text}&rdquo;</span>
-            <span className="qf-author">— {q.author}</span>
-          </div>
-        ))}
-      </div>
-    </section>
-  )
-}
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// ── Physics helpers ───────────────────────────────────────────────────────────
 
 function setPos(b: Body) {
-  if (b.el) b.el.style.transform = `translate(${b.x - b.w / 2}px, ${b.y - b.h / 2}px)`
+  if (!b.el) return
+  const s = Math.min(b.spawning, 1)
+  b.el.style.transform = `translate(${b.x - b.w / 2}px, ${b.y - b.h / 2}px) scale(${s})`
+  b.el.style.opacity = String(s)
 }
 
 function wallBounce(bods: Body[], cw: number, ch: number) {
   for (const b of bods) {
-    if (b.x - b.r < 0)    { b.x = b.r;      b.vx =  Math.abs(b.vx) }
-    if (b.x + b.r > cw)   { b.x = cw - b.r; b.vx = -Math.abs(b.vx) }
-    if (b.y - b.r < 0)    { b.y = b.r;      b.vy =  Math.abs(b.vy) }
-    if (b.y + b.r > ch)   { b.y = ch - b.r; b.vy = -Math.abs(b.vy) }
+    if (b.x - b.r < 0)   { b.x = b.r;      b.vx =  Math.abs(b.vx) }
+    if (b.x + b.r > cw)  { b.x = cw - b.r; b.vx = -Math.abs(b.vx) }
+    if (b.y - b.r < 0)   { b.y = b.r;      b.vy =  Math.abs(b.vy) }
+    if (b.y + b.r > ch)  { b.y = ch - b.r; b.vy = -Math.abs(b.vy) }
   }
 }
 
@@ -174,19 +77,15 @@ function collidePairs(bods: Body[]) {
   for (let i = 0; i < bods.length; i++) {
     for (let j = i + 1; j < bods.length; j++) {
       const a = bods[i], b = bods[j]
-      const dx = b.x - a.x
-      const dy = b.y - a.y
+      if (a.spawning < 0.5 || b.spawning < 0.5) continue
+      const dx = b.x - a.x, dy = b.y - a.y
       const dist = Math.hypot(dx, dy) || 0.001
       const minD = a.r + b.r
       if (dist >= minD) continue
-
-      // Push apart
       const nx = dx / dist, ny = dy / dist
-      const overlap = (minD - dist) / 2
-      a.x -= nx * overlap; a.y -= ny * overlap
-      b.x += nx * overlap; b.y += ny * overlap
-
-      // Elastic velocity exchange along collision normal
+      const ov = (minD - dist) / 2
+      a.x -= nx * ov; a.y -= ny * ov
+      b.x += nx * ov; b.y += ny * ov
       const dvx = a.vx - b.vx, dvy = a.vy - b.vy
       const dot = dvx * nx + dvy * ny
       if (dot > 0) {
@@ -197,7 +96,291 @@ function collidePairs(bods: Body[]) {
   }
 }
 
-function separateBodies(bods: Body[], cw: number, ch: number) {
-  wallBounce(bods, cw, ch)
-  collidePairs(bods)
+// ── Component ─────────────────────────────────────────────────────────────────
+
+export default function QuotesSection() {
+  const [heroActive, setHeroActive] = useState(0)
+  const [heroFading, setHeroFading] = useState(false)
+  const [expanded,   setExpanded]   = useState<FQ | null>(null)
+  const [filter,     setFilter]     = useState<string | null>(null)
+  const [allQuotes,  setAllQuotes]  = useState<FQ[]>(ALL_FLOAT_QUOTES)
+
+  const containerRef = useRef<HTMLDivElement>(null)
+  const elRefs       = useRef<(HTMLDivElement | null)[]>([])
+  const bodiesRef    = useRef<Body[]>([])
+  const animRef      = useRef<number>(0)
+  const canvasRef    = useRef<HTMLCanvasElement>(null)
+  const filterRef    = useRef<string | null>(null)
+  const hoveredRef   = useRef<string | null>(null)
+  const starsRef     = useRef<Star[]>([])
+  const lastStarRef  = useRef<number>(0)
+  const spawnIdxRef  = useRef<number>(0)
+  const dragRef      = useRef<{
+    bi: number; ox: number; oy: number
+    lx: number; ly: number; lvx: number; lvy: number; moved: boolean
+  } | null>(null)
+
+  // Sync refs
+  useEffect(() => { filterRef.current = filter }, [filter])
+
+  // Hero quote rotation
+  useEffect(() => {
+    const t = setInterval(() => {
+      setHeroFading(true)
+      setTimeout(() => { setHeroActive(a => (a + 1) % HERO_QUOTES.length); setHeroFading(false) }, 300)
+    }, 8000)
+    return () => clearInterval(t)
+  }, [])
+
+  // ── Physics + canvas loop ────────────────────────────────────────────────
+  useEffect(() => {
+    const container = containerRef.current
+    const canvas    = canvasRef.current
+    if (!container || !canvas) return
+
+    const init = () => {
+      const CW = container.offsetWidth
+      const CH = container.offsetHeight
+      canvas.width  = CW
+      canvas.height = CH
+
+      bodiesRef.current = elRefs.current.map((el, i) => {
+        if (!el) return null
+        const w = el.offsetWidth, h = el.offsetHeight
+        const q = allQuotes[i]
+        const r = (w + h) / 4 + 6
+        const angle = (i / allQuotes.length) * Math.PI * 2
+        const spread = 0.28 + (i % 4) * 0.09
+        return {
+          el, w, h, r, trail: [] as { x: number; y: number }[],
+          x:  CW / 2 + Math.cos(angle) * CW * spread * 0.38,
+          y:  CH / 2 + Math.sin(angle) * CH * spread * 0.38,
+          vx: Math.cos(angle + Math.PI / 2) * (0.28 + (i % 5) * 0.055),
+          vy: Math.sin(angle + Math.PI / 2) * (0.28 + (i % 5) * 0.055),
+          spawning: 1,
+          idx: i,
+        }
+      }).filter((b): b is Body => b !== null)
+
+      // Settle
+      for (let s = 0; s < 80; s++) { wallBounce(bodiesRef.current, CW, CH); collidePairs(bodiesRef.current) }
+      bodiesRef.current.forEach(setPos)
+
+      cancelAnimationFrame(animRef.current)
+      const ctx = canvas.getContext("2d")!
+      let frame = 0
+
+      const tick = (now: number) => {
+        const cw = container.offsetWidth
+        const ch = container.offsetHeight
+        if (canvas.width !== cw || canvas.height !== ch) { canvas.width = cw; canvas.height = ch }
+        const bods = bodiesRef.current
+
+        // Update spawning
+        for (const b of bods) if (b.spawning < 1) b.spawning = Math.min(1, b.spawning + 0.025)
+
+        // Move (skip dragged)
+        const dragged = dragRef.current?.bi ?? -1
+        for (let i = 0; i < bods.length; i++) {
+          if (i === dragged) continue
+          bods[i].x += bods[i].vx
+          bods[i].y += bods[i].vy
+        }
+
+        wallBounce(bods, cw, ch)
+        collidePairs(bods)
+
+        // Trails
+        frame++
+        if (frame % 3 === 0) {
+          for (const b of bods) {
+            if (b.spawning < 1) continue
+            b.trail.push({ x: b.x, y: b.y })
+            if (b.trail.length > 10) b.trail.shift()
+          }
+        }
+
+        // Update filter opacity
+        const f = filterRef.current
+        for (const b of bods) {
+          if (!b.el) continue
+          const q = allQuotes[b.idx]
+          const matched = !f || q?.author === f
+          b.el.style.filter = matched ? "" : "opacity(0.18)"
+        }
+
+        // ── Canvas draw ──
+        ctx.clearRect(0, 0, cw, ch)
+
+        // Trails
+        for (const b of bods) {
+          if (b.trail.length < 2 || b.spawning < 1) continue
+          const q = allQuotes[b.idx]
+          const dimmed = f && q?.author !== f
+          for (let i = 1; i < b.trail.length; i++) {
+            const a = (i / b.trail.length) * (dimmed ? 0.04 : 0.13)
+            ctx.beginPath()
+            ctx.moveTo(b.trail[i - 1].x, b.trail[i - 1].y)
+            ctx.lineTo(b.trail[i].x, b.trail[i].y)
+            ctx.strokeStyle = `rgba(120,200,255,${a})`
+            ctx.lineWidth = (i / b.trail.length) * 3
+            ctx.stroke()
+          }
+        }
+
+        // Author connection lines on hover
+        const ha = hoveredRef.current
+        if (ha) {
+          const peers = bods.filter(b => allQuotes[b.idx]?.author === ha && b.spawning >= 1)
+          for (let i = 0; i < peers.length; i++) {
+            for (let j = i + 1; j < peers.length; j++) {
+              const a = peers[i], b = peers[j]
+              const grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y)
+              grad.addColorStop(0, "rgba(77,184,255,0.55)")
+              grad.addColorStop(1, "rgba(160,100,255,0.55)")
+              ctx.beginPath()
+              ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y)
+              ctx.strokeStyle = grad; ctx.lineWidth = 0.8
+              ctx.setLineDash([5, 4]); ctx.stroke(); ctx.setLineDash([])
+            }
+          }
+        }
+
+        // Shooting stars
+        if (now - lastStarRef.current > 9000 + Math.random() * 6000) {
+          lastStarRef.current = now
+          const edge = Math.random() < 0.5
+          starsRef.current.push({
+            x: edge ? -30 : Math.random() * cw,
+            y: edge ? Math.random() * ch * 0.5 : -10,
+            vx: edge ? 5 + Math.random() * 4 : 2 + Math.random() * 2,
+            vy: edge ? 2 + Math.random() * 2 : 4 + Math.random() * 3,
+            alpha: 0.9, decay: 0.012 + Math.random() * 0.01,
+          })
+        }
+        starsRef.current = starsRef.current.filter(s => s.alpha > 0)
+        for (const s of starsRef.current) {
+          s.x += s.vx; s.y += s.vy; s.alpha -= s.decay
+          const tailLen = 40 + Math.hypot(s.vx, s.vy) * 8
+          const ang = Math.atan2(s.vy, s.vx)
+          const tx = s.x - Math.cos(ang) * tailLen
+          const ty = s.y - Math.sin(ang) * tailLen
+          const sg = ctx.createLinearGradient(tx, ty, s.x, s.y)
+          sg.addColorStop(0, "rgba(255,255,255,0)")
+          sg.addColorStop(1, `rgba(200,230,255,${s.alpha})`)
+          ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(s.x, s.y)
+          ctx.strokeStyle = sg; ctx.lineWidth = 1.5; ctx.stroke()
+          ctx.beginPath(); ctx.arc(s.x, s.y, 1.5, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(255,255,255,${s.alpha})`; ctx.fill()
+        }
+
+        bods.forEach(setPos)
+        animRef.current = requestAnimationFrame(tick)
+      }
+
+      animRef.current = requestAnimationFrame(tick)
+    }
+
+    const t = setTimeout(init, 80)
+    return () => { clearTimeout(t); cancelAnimationFrame(animRef.current) }
+  }, [allQuotes])  // re-init when quotes list grows
+
+  // ── Spawn new quotes every 30s ─────────────────────────────────────────
+  useEffect(() => {
+    const t = setInterval(() => {
+      if (spawnIdxRef.current >= SPAWN_POOL.length) return
+      const q = SPAWN_POOL[spawnIdxRef.current++]
+      setAllQuotes(prev => [...prev, q])
+    }, 30000)
+    return () => clearInterval(t)
+  }, [])
+
+  // ── Drag handlers ─────────────────────────────────────────────────────────
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>, bi: number) => {
+    e.currentTarget.setPointerCapture(e.pointerId)
+    dragRef.current = { bi, ox: e.clientX, oy: e.clientY, lx: e.clientX, ly: e.clientY, lvx: 0, lvy: 0, moved: false }
+  }
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const d = dragRef.current
+    if (!d) return
+    const dx = e.clientX - d.lx, dy = e.clientY - d.ly
+    if (Math.hypot(e.clientX - d.ox, e.clientY - d.oy) > 6) d.moved = true
+    const b = bodiesRef.current[d.bi]
+    if (b) { b.x += dx; b.y += dy }
+    d.lvx = dx; d.lvy = dy; d.lx = e.clientX; d.ly = e.clientY
+  }
+  const onPointerUp = (e: React.PointerEvent<HTMLDivElement>, bi: number, q: FQ) => {
+    const d = dragRef.current
+    dragRef.current = null
+    if (!d) return
+    const b = bodiesRef.current[bi]
+    if (b) {
+      // Apply throw velocity, cap speed
+      const spd = Math.hypot(d.lvx, d.lvy)
+      const cap = 4
+      const sc = spd > cap ? cap / spd : 1
+      b.vx = d.lvx * sc; b.vy = d.lvy * sc
+    }
+    if (!d.moved) setExpanded(q)
+  }
+
+  const q = HERO_QUOTES[heroActive]
+
+  return (
+    <section className="quotes-section snap-section">
+
+      {/* Filter bar */}
+      <div className="quotes-filter-bar">
+        <button className={`qf-btn${!filter ? " qf-btn--active" : ""}`} onClick={() => setFilter(null)}>All</button>
+        {UNIQUE_AUTHORS.map(a => (
+          <button key={a} className={`qf-btn${filter === a ? " qf-btn--active" : ""}`} onClick={() => setFilter(f => f === a ? null : a)}>{a}</button>
+        ))}
+      </div>
+
+      {/* Hero rotating quote */}
+      <div className="quote-text" style={{ opacity: heroFading ? 0 : 1 }}>&ldquo;{q.text}&rdquo;</div>
+      <div className="quote-author" style={{ opacity: heroFading ? 0 : 1, transition: "opacity 0.3s ease" }}>— {q.author}</div>
+      <div className="quote-dots">
+        {HERO_QUOTES.map((_, i) => (
+          <button key={i} className={`quote-dot${heroActive === i ? " active" : ""}`}
+            onClick={() => { setHeroFading(true); setTimeout(() => { setHeroActive(i); setHeroFading(false) }, 300) }}
+            aria-label={`Quote ${i + 1}`} />
+        ))}
+      </div>
+
+      {/* Physics field */}
+      <div ref={containerRef} className="quotes-float-field" aria-hidden="true">
+        <canvas ref={canvasRef} className="qf-canvas" />
+        {allQuotes.map((fq, i) => (
+          <div
+            key={i}
+            ref={el => { elRefs.current[i] = el }}
+            className="quote-floater"
+            style={{ fontSize: `${fq.size * 0.72}rem` }}
+            onPointerDown={e => onPointerDown(e, i)}
+            onPointerMove={onPointerMove}
+            onPointerUp={e => onPointerUp(e, i, fq)}
+            onMouseEnter={() => { hoveredRef.current = fq.author }}
+            onMouseLeave={() => { hoveredRef.current = null }}
+            aria-hidden="false"
+          >
+            <span className="qf-text">&ldquo;{fq.text}&rdquo;</span>
+            <span className="qf-author">— {fq.author}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Expanded modal */}
+      {expanded && (
+        <div className="qe-overlay" onClick={() => setExpanded(null)}>
+          <div className="qe-modal" onClick={e => e.stopPropagation()}>
+            <button className="qe-close" onClick={() => setExpanded(null)}>✕</button>
+            <div className="qe-quote">&ldquo;{expanded.text}&rdquo;</div>
+            <div className="qe-author">— {expanded.author}</div>
+            <p className="qe-bio">{expanded.bio}</p>
+          </div>
+        </div>
+      )}
+    </section>
+  )
 }
