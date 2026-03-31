@@ -2315,15 +2315,15 @@ section {
 
 /* ─── QUOTES SECTION ─────────────────────────────────────────────────── */
 .quotes-section {
-  padding: 100px clamp(24px, 6vw, 96px);
+  padding: 80px clamp(24px, 6vw, 96px) 60px;
   position: relative;
   z-index: 2;
   text-align: center;
-  min-height: 40vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
+  gap: 0;
 }
 .quote-text {
   font-size: clamp(1.1rem, 2.5vw, 1.6rem);
@@ -2364,12 +2364,32 @@ section {
   box-shadow: 0 0 8px rgba(77,184,255,0.6);
 }
 
-/* ── Zero-gravity floating quotes ──────────────────────────────────── */
+/* ── Wormhole bubble ────────────────────────────────────────────────── */
+.wormhole-bubble {
+  position: relative;
+  width: min(680px, 90vw);
+  height: min(420px, 52vw, 55vh);
+  margin-top: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.wormhole-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── Zero-gravity floating quotes inside bubble ─────────────────────── */
 .quotes-float-field {
   position: absolute;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
+  border-radius: 50%;
 }
 
 @keyframes quote-drift {
@@ -2382,11 +2402,11 @@ section {
 
 .quote-floater {
   position: absolute;
-  max-width: 340px;
+  max-width: 220px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  animation: quote-drift linear infinite;
+  gap: 3px;
+  animation: quote-drift ease-in-out infinite;
   will-change: transform;
 }
 
@@ -2395,8 +2415,9 @@ section {
   font-style: italic;
   font-weight: 300;
   color: rgba(255,255,255,1);
-  line-height: 1.55;
+  line-height: 1.5;
   letter-spacing: 0.01em;
+  text-shadow: 0 0 12px rgba(77,184,255,0.4);
 }
 
 .qf-author {
@@ -2404,9 +2425,10 @@ section {
   font-family: var(--font-display);
   font-size: 0.5em;
   letter-spacing: 0.2em;
-  color: rgba(77,184,255,1);
+  color: rgba(120,200,255,1);
   text-transform: uppercase;
   margin-top: 2px;
+  text-shadow: 0 0 8px rgba(77,184,255,0.5);
 }
 
 /* ─── KEYBOARD NAV TOOLTIP ───────────────────────────────────────────── */
