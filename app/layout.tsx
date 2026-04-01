@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Orbitron, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
+import StellarDrift from "@/components/StellarDrift";
 import "./globals.css";
 
 const orbitron = Orbitron({
@@ -47,6 +48,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <div aria-hidden="true" className="noise-overlay" />
+        <StellarDrift shootingStars={true} scrollParallax={true} driftSpeed={1.0} />
         {children}
         <Analytics />
       </body>
