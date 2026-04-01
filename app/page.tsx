@@ -20,6 +20,7 @@ import ContextMenu       from "../components/ContextMenu"
 import CollabSection     from "../components/CollabSection"
 import CursorSystem      from "../components/CursorSystem"
 import RevealText        from "../components/RevealText"
+import HubbleDeepField   from "../components/HubbleDeepField"
 import { motion, useInView, AnimatePresence } from "framer-motion"
 
 const SECTIONS = [
@@ -384,6 +385,13 @@ export default function Page() {
 
           {/* ── HOME ────────────────────────────────────────────── */}
           <section ref={homeRef} className="home-section snap-section" data-mode="home" style={{ position: "relative" }}>
+            {/* Hubble deep field — bottommost layer */}
+            <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
+              <HubbleDeepField renderScale={0.38} className="w-full h-full" />
+            </div>
+            {/* Subtle vignette so HeroCanvas particles + text stay crisp */}
+            <div style={{ position: "absolute", inset: 0, zIndex: 1, background: "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.45) 100%)", pointerEvents: "none" }} />
+            {/* HeroCanvas at z-index 2 — above deep field and overlay */}
             <HeroCanvas />
             {/* Boot scanline */}
             <motion.div
