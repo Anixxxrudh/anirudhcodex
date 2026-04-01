@@ -140,6 +140,7 @@ export default function QuotesSection() {
   const hoveredRef   = useRef<string | null>(null)
   const spawnIdxRef  = useRef<number>(0)
   const selectorRef  = useRef<HTMLDivElement>(null)
+  const allQuotesRef = useRef<FQ[]>(ALL_FLOAT_QUOTES)
   const dragRef      = useRef<{
     bi: number; ox: number; oy: number
     lx: number; ly: number; lvx: number; lvy: number; moved: boolean
@@ -147,6 +148,7 @@ export default function QuotesSection() {
 
   // Sync refs
   useEffect(() => { filterRef.current = filter }, [filter])
+  useEffect(() => { allQuotesRef.current = allQuotes }, [allQuotes])
 
 
   // ── Physics + canvas loop ────────────────────────────────────────────────
@@ -164,9 +166,9 @@ export default function QuotesSection() {
       bodiesRef.current = elRefs.current.map((el, i) => {
         if (!el) return null
         const w = el.offsetWidth, h = el.offsetHeight
-        const q = allQuotes[i]
         const r = (w + h) / 4 + 6
-        const angle = (i / allQuotes.length) * Math.PI * 2
+        const total = allQuotesRef.current.length
+        const angle = (i / total) * Math.PI * 2
         const spread = 0.28 + (i % 4) * 0.09
         return {
           el, w, h, r, trail: [] as { x: number; y: number }[],
@@ -237,10 +239,10 @@ export default function QuotesSection() {
 
         // Update filter opacity
         const f = filterRef.current
+        const aq = allQuotesRef.current
         for (const b of bods) {
           if (!b.el) continue
-          const q = allQuotes[b.idx]
-          const matched = !f || q?.author === f
+          const matched = !f || aq[b.idx]?.author === f
           b.el.style.filter = matched ? "" : "opacity(0.18)"
         }
 
@@ -250,8 +252,7 @@ export default function QuotesSection() {
         // Trails
         for (const b of bods) {
           if (b.trail.length < 2 || b.spawning < 1) continue
-          const q = allQuotes[b.idx]
-          const dimmed = f && q?.author !== f
+          const dimmed = f && aq[b.idx]?.author !== f
           for (let i = 1; i < b.trail.length; i++) {
             const a = (i / b.trail.length) * (dimmed ? 0.04 : 0.13)
             ctx.beginPath()
@@ -266,7 +267,7 @@ export default function QuotesSection() {
         // Author connection lines on hover
         const ha = hoveredRef.current
         if (ha) {
-          const peers = bods.filter(b => allQuotes[b.idx]?.author === ha && b.spawning >= 1)
+          const peers = bods.filter(b => aq[b.idx]?.author === ha && b.spawning >= 1)
           for (let i = 0; i < peers.length; i++) {
             for (let j = i + 1; j < peers.length; j++) {
               const a = peers[i], b = peers[j]
@@ -291,14 +292,42 @@ export default function QuotesSection() {
 
     const t = setTimeout(init, 80)
     return () => { clearTimeout(t); cancelAnimationFrame(animRef.current) }
-  }, [allQuotes])  // re-init when quotes list grows
+  }, [])  // run once — never re-init; new bodies are injected directly
 
-  // ── Spawn new quotes every 30s ─────────────────────────────────────────
+  // ── Spawn new quotes every 30s — inject body directly, no re-init ──────
   useEffect(() => {
     const t = setInterval(() => {
       if (spawnIdxRef.current >= SPAWN_POOL.length) return
       const q = SPAWN_POOL[spawnIdxRef.current++]
-      setAllQuotes(prev => [...prev, q])
+      const newIdx = allQuotesRef.current.length
+      // Add to state so React renders the new bubble div
+      setAllQuotes(prev => {
+        allQuotesRef.current = [...prev, q]
+        return allQuotesRef.current
+      })
+      // After React renders the new el, build its body and push it in
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const el = elRefs.current[newIdx]
+          const container = containerRef.current
+          if (!el || !container) return
+          const w = el.offsetWidth, h = el.offsetHeight
+          const r = (w + h) / 4 + 6
+          const CW = container.offsetWidth, CH = container.offsetHeight
+          const angle = Math.random() * Math.PI * 2
+          const body: Body = {
+            el, w, h, r,
+            trail: [] as { x: number; y: number }[],
+            x: CW / 2 + Math.cos(angle) * CW * 0.35,
+            y: CH / 2 + Math.sin(angle) * CH * 0.35,
+            vx: Math.cos(angle + Math.PI / 2) * 0.3,
+            vy: Math.sin(angle + Math.PI / 2) * 0.3,
+            spawning: 0,
+            idx: newIdx,
+          }
+          bodiesRef.current.push(body)
+        })
+      })
     }, 30000)
     return () => clearInterval(t)
   }, [])
