@@ -20,6 +20,9 @@ import ContextMenu       from "../components/ContextMenu"
 import CollabSection     from "../components/CollabSection"
 import CursorSystem      from "../components/CursorSystem"
 import RevealText        from "../components/RevealText"
+import BlackHoleTransition, { BlackHoleHandle } from "../components/BlackHoleTransition"
+import ParticleAssemble  from "../components/ParticleAssemble"
+import TidalGrid         from "../components/TidalGrid"
 import { motion, useInView, AnimatePresence } from "framer-motion"
 
 const SECTIONS = [
@@ -54,10 +57,10 @@ export default function Page() {
   const [activeSection, setActiveSection] = useState(0)
   const [cmdOpen,       setCmdOpen]       = useState(false)
   const [kbTooltip,     setKbTooltip]     = useState(false)
-  const [isTransitioning, setIsTransitioning] = useState(false)
   const [expandedCard,  setExpandedCard]  = useState<string | null>(null)
 
-  const transitioning = useRef(false)
+  const transitioning   = useRef(false)
+  const blackHoleRef    = useRef<BlackHoleHandle>(null)
 
   const snapRef  = useRef<HTMLDivElement>(null)
   const flashRef = useRef<HTMLDivElement>(null)
@@ -99,13 +102,13 @@ export default function Page() {
     map[section]?.current?.scrollIntoView({ behavior: "smooth" })
   }, [])
 
-  // ─── WORMHOLE NAV (navbar clicks only) ───────────────────────────
+  // ─── BLACK HOLE NAV (navbar clicks only) ─────────────────────────
   const navigateWithTransition = useCallback((section: string) => {
     if (transitioning.current) return
     transitioning.current = true
-    setIsTransitioning(true)
-    setTimeout(() => scrollToSection(section), 350)
-    setTimeout(() => { setIsTransitioning(false); transitioning.current = false }, 700)
+    blackHoleRef.current?.trigger()
+    setTimeout(() => scrollToSection(section), 380)
+    setTimeout(() => { transitioning.current = false }, 720)
   }, [scrollToSection])
 
   // ─── DERIVE MODE FROM ACTIVE SECTION ─────────────────────────────
@@ -304,15 +307,8 @@ export default function Page() {
       {/* Cinematic full-screen flash */}
       <div ref={fullFlashRef} id="section-flash-full" />
 
-      {/* Wormhole transition overlay */}
-      {isTransitioning && (
-        <div className="wormhole-overlay">
-          <div className="wormhole-core" />
-          {Array.from({ length: 8 }, (_, i) => (
-            <div key={i} className="wormhole-ring" style={{ animationDelay: `${i * 35}ms` }} />
-          ))}
-        </div>
-      )}
+      {/* Black hole nav transition */}
+      <BlackHoleTransition ref={blackHoleRef} />
 
       {/* Loading screen */}
       {!loaded && <LoadingScreen onComplete={() => setLoaded(true)} />}
@@ -517,10 +513,12 @@ export default function Page() {
           {/* ── PROJECTS ─────────────────────────────────────────── */}
           <section ref={projectsRef} className="projects-grid-section fade-section snap-section" data-mode="projects" style={{ position: "relative" }}>
             <span className="section-ghost-number">02</span>
-            <div className="projects-grid-header">
-              <div className="section-eyebrow">Projects</div>
-              <h2 className="section-title">Selected Work</h2>
-            </div>
+            <ParticleAssemble>
+              <div className="projects-grid-header">
+                <div className="section-eyebrow">Projects</div>
+                <h2 className="section-title">Selected Work</h2>
+              </div>
+            </ParticleAssemble>
             <div className="projects-grid">
               {([
                 {
@@ -638,19 +636,21 @@ export default function Page() {
                   </div>
                 ))}
               </div>
-              <div className="placeholder-grid">
+              <TidalGrid className="placeholder-grid">
                 {[
                   { label: "Research Focus", title: "Solar Photovoltaics",          body: "At PVIC, I work on improving the efficiency of CdTe/CdSeTe thin-film solar cells through back-interface engineering. The work involves fabricating devices, running JV and EQE characterization, and analyzing how carbon nanotube networks and ALD-deposited aluminum oxide affect carrier recombination. Physics applied to a problem that matters." },
                   { label: "Interest Area",  title: "Cosmology & the Early Universe", body: "The questions that pull me most are the large-scale ones — what triggered the Big Bang, what dark matter actually is, and how dark energy is driving the accelerating expansion of the universe. These are not just abstract puzzles. They define the structure of everything that exists." },
                   { label: "Lab Visuals — Coming Soon", title: "Research Images & Data", body: "Lab photographs, device characterization plots, and JV/EQE data visualizations from PVIC research will be displayed here." },
-                ].map((c) => (
-                  <TiltCard key={c.title} className="placeholder-card">
-                    <span className="placeholder-card-label">{c.label}</span>
-                    <h3 className="placeholder-card-title">{c.title}</h3>
-                    <p className="placeholder-card-body">{c.body}</p>
-                  </TiltCard>
+                ].map((c, i) => (
+                  <ParticleAssemble key={c.title} className="tidal-item" delay={i * 120}>
+                    <TiltCard className="placeholder-card">
+                      <span className="placeholder-card-label">{c.label}</span>
+                      <h3 className="placeholder-card-title">{c.title}</h3>
+                      <p className="placeholder-card-body">{c.body}</p>
+                    </TiltCard>
+                  </ParticleAssemble>
                 ))}
-              </div>
+              </TidalGrid>
             </div>
             <AtomCanvas />
             <SolarSystem />
