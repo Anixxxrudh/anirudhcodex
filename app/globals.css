@@ -190,7 +190,7 @@ section {
   bottom: 80px;
   left: 50%;
   transform: translateX(-50%);
-  width: min(560px, 85vw);
+  width: min(740px, 92vw);
   height: 220px;
   overflow: hidden;
   perspective: 280px;
@@ -208,22 +208,22 @@ section {
   text-align: center;
   transform-origin: bottom center;
   transform: rotateX(22deg);
-  animation: crawl 28s linear infinite;
+  animation: crawl 48s linear infinite;
   animation-delay: 1s;
 }
 
 .crawl-inner p {
-  font-family: var(--font-body);
-  font-size: clamp(0.7rem, 1.5vw, 0.88rem);
-  line-height: 1.85;
+  font-family: var(--font-display);
+  font-size: clamp(0.58rem, 1.1vw, 0.72rem);
+  line-height: 1.9;
   color: rgba(255, 220, 100, 0.75);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.03em;
   padding: 0 8px 28px;
 }
 
 @keyframes crawl {
-  0%   { bottom: -80%; }
-  100% { bottom: 130%; }
+  0%   { bottom: -360%; }
+  100% { bottom: 120%; }
 }
 
 /* ─── ABOUT ─────────────────────────────────────────────────────────── */
