@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import Link from "next/link"
+import { useHyperjump } from "@/hooks/useHyperjump"
 import Navbar from "../../components/Navbar"
 
 const CARDS = [
@@ -33,6 +33,7 @@ const CARDS = [
 ]
 
 export default function ClassifiedPage() {
+  const jump = useHyperjump()
   const [unlocked, setUnlocked] = useState(false)
   const [input, setInput] = useState("")
   const [status, setStatus] = useState<"idle" | "denied" | "granted">("idle")
@@ -135,9 +136,9 @@ export default function ClassifiedPage() {
               </div>
             ))}
           </div>
-          <Link href="/" className="resume-btn" style={{ marginTop: 40 }}>
+          <a href="/" className="resume-btn" style={{ marginTop: 40 }} onClick={(e) => { e.preventDefault(); jump("/") }}>
             RETURN TO PROTOCOL
-          </Link>
+          </a>
         </div>
       </div>
     )
@@ -242,7 +243,7 @@ export default function ClassifiedPage() {
           AUTHENTICATE
         </button>
 
-        <Link
+        <a
           href="/"
           style={{
             fontFamily: "var(--font-display)",
@@ -254,9 +255,10 @@ export default function ClassifiedPage() {
             marginTop: 16,
             transition: "color 0.2s ease",
           }}
+          onClick={(e) => { e.preventDefault(); jump("/") }}
         >
           ← Return to Protocol
-        </Link>
+        </a>
       </div>
     </div>
   )

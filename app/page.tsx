@@ -24,6 +24,7 @@ import BlackHoleTransition, { BlackHoleHandle } from "../components/BlackHoleTra
 import ParticleAssemble  from "../components/ParticleAssemble"
 import TidalGrid         from "../components/TidalGrid"
 import { motion, useInView, AnimatePresence } from "framer-motion"
+import { useHyperjump } from "@/hooks/useHyperjump"
 
 const SECTIONS = [
   { key: "home",     label: "HOME",     mode: "home"     },
@@ -49,6 +50,7 @@ const FLASH_CLASS: Record<string, string> = {
 }
 
 export default function Page() {
+  const jump = useHyperjump()
   const [loaded,        setLoaded]        = useState(false)
   const [scrolled,      setScrolled]      = useState(false)
   const [scrollProgress,setScrollProgress]= useState(0)
@@ -678,6 +680,7 @@ export default function Page() {
                     href={`/hobbies/${h.id}`}
                     className="hobby-card"
                     style={{ ["--hobby-accent" as string]: h.accent }}
+                    onClick={(e) => { e.preventDefault(); jump(`/hobbies/${h.id}`) }}
                   >
                     <span className="hobby-icon">{h.icon}</span>
                     <h3 className="hobby-name">{h.name}</h3>
@@ -772,7 +775,7 @@ export default function Page() {
             </div>
 
             {/* Classified hint — subtle */}
-            <a href="/classified" className="classified-hint">
+            <a href="/classified" className="classified-hint" onClick={(e) => { e.preventDefault(); jump("/classified") }}>
               Access Level: Restricted — /classified
             </a>
 

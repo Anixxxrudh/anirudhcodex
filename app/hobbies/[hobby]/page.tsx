@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { HyperjumpLink } from "@/components/HyperjumpLink"
 import "../../globals.css"
 
 const HOBBIES: Record<string, { name: string; tagline: string; accent: string; description: string }> = {
@@ -51,7 +51,7 @@ export default async function HobbyPage({ params }: { params: Promise<{ hobby: s
   if (!data) {
     return (
       <main className="hobby-page-shell">
-        <Link href="/#hobbies" className="hobby-back">← Back</Link>
+        <HyperjumpLink href="/#hobbies" className="hobby-back">← Back</HyperjumpLink>
         <h1 className="hobby-page-title" style={{ color: "rgba(255,255,255,0.5)" }}>Not found.</h1>
       </main>
     )
@@ -60,7 +60,7 @@ export default async function HobbyPage({ params }: { params: Promise<{ hobby: s
   return (
     <main className="hobby-page-shell">
       {/* Back */}
-      <Link href="/#hobbies" className="hobby-back">← Back to Hobbies</Link>
+      <HyperjumpLink href="/#hobbies" className="hobby-back">← Back to Hobbies</HyperjumpLink>
 
       {/* Header */}
       <div className="hobby-page-header">

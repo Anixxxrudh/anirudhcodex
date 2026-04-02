@@ -1,10 +1,11 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import Link from "next/link"
+import { useHyperjump } from "@/hooks/useHyperjump"
 import Navbar from "../components/Navbar"
 
 export default function NotFound() {
+  const jump = useHyperjump()
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -77,9 +78,9 @@ export default function NotFound() {
         <p className="not-found-desc">
           The coordinates you entered do not exist within The Protocol.
         </p>
-        <Link href="/" className="resume-btn">
+        <a href="/" className="resume-btn" onClick={(e) => { e.preventDefault(); jump("/") }}>
           RETURN TO PROTOCOL
-        </Link>
+        </a>
       </div>
     </div>
   )

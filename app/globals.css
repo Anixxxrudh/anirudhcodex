@@ -1119,18 +1119,17 @@ section {
   100% { opacity: 0; transform: scaleX(1); }
 }
 
-/* ─── FADE-IN SECTIONS + REDSHIFT ENTER ─────────────────────────────── */
-@keyframes redshift-in {
-  0%   { opacity: 0; transform: translateY(30px); filter: sepia(0.85) hue-rotate(290deg) saturate(2) brightness(0.55); }
-  40%  { opacity: 0.7; transform: translateY(10px); filter: sepia(0.2) hue-rotate(200deg) saturate(1.3) brightness(0.88); }
-  100% { opacity: 1; transform: translateY(0); filter: none; }
+/* ─── FADE-IN SECTIONS ───────────────────────────────────────────────── */
+@keyframes fade-up-in {
+  0%   { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 .fade-section {
   opacity: 0;
   transform: translateY(30px);
 }
 .fade-section.in-view {
-  animation: redshift-in 1.15s ease-out forwards;
+  animation: fade-up-in 1.15s ease-out forwards;
 }
 
 /* ─── TIDAL ITEM ─────────────────────────────────────────────────────── */
