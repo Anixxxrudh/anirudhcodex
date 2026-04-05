@@ -47,7 +47,9 @@ const FLASH_CLASS: Record<string, string> = {
 
 export default function Page() {
   const jump = useHyperjump()
-  const [loaded,        setLoaded]        = useState(false)
+  const [loaded, setLoaded] = useState(() =>
+    typeof window !== 'undefined' && sessionStorage.getItem('protocol-loaded') === '1'
+  )
   const [scrolled,      setScrolled]      = useState(false)
   const [scrollProgress,setScrollProgress]= useState(0)
   const [sectionProgress,setSectionProgress] = useState(0)
@@ -296,7 +298,7 @@ export default function Page() {
       <BlackHoleTransition ref={blackHoleRef} />
 
       {/* Loading screen */}
-      {!loaded && <LoadingScreen onComplete={() => setLoaded(true)} />}
+      {!loaded && <LoadingScreen onComplete={() => { sessionStorage.setItem('protocol-loaded', '1'); setLoaded(true) }} />}
 
       {/* Easter egg */}
       <EasterEgg />
