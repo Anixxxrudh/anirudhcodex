@@ -6,7 +6,8 @@ type CursorMode = "pulsar" | "lightsaber" | "spaceship" | "blackhole" | "whiteho
 
 type NavbarProps = {
   mode: string
-  setMode: (mode: string) => void
+  activeKey?: string
+  setMode?: (mode: string) => void
   scrollToSection: (section: string) => void
 }
 
@@ -32,7 +33,7 @@ const CURSOR_LIST: { id: CursorMode; label: string; icon: string }[] = [
   { id: "solarsystem", label: "Solar System", icon: "🪐" },
 ]
 
-export default function Navbar({ mode, setMode, scrollToSection }: NavbarProps) {
+export default function Navbar({ mode, activeKey = '', scrollToSection }: NavbarProps) {
   const jump = useHyperjump()
   const [open,       setOpen]       = useState(false)
   const [cursorOpen, setCursorOpen] = useState(false)
@@ -45,7 +46,6 @@ export default function Navbar({ mode, setMode, scrollToSection }: NavbarProps) 
   }, [])
 
   const go = (key: string) => {
-    setMode(key)
     setOpen(false)
     setCursorOpen(false)
     jump(null, () => scrollToSection(key))
@@ -72,7 +72,7 @@ export default function Navbar({ mode, setMode, scrollToSection }: NavbarProps) 
         {NAV_ITEMS.map(({ key, label }) => (
           <button
             key={key}
-            className={`navbar-desktop-btn${mode === key ? " active" : ""}`}
+            className={`navbar-desktop-btn${activeKey === key ? " active" : ""}`}
             onClick={() => go(key)}
           >
             {label}

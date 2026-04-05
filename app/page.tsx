@@ -316,7 +316,7 @@ export default function Page() {
       <BackgroundCanvas mode={mode} scrollProgress={scrollProgress} />
 
       {/* Navbar */}
-      <Navbar setMode={setMode} mode={mode} scrollToSection={scrollToSection} />
+      <Navbar mode={mode} activeKey={SECTIONS[activeSection]?.key ?? 'home'} setMode={setMode} scrollToSection={scrollToSection} />
 
       {/* ⌘K hint */}
       <button
