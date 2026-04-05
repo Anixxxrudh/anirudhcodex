@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
 import { useHyperjump } from "@/hooks/useHyperjump"
 
 type CursorMode = "pulsar" | "lightsaber" | "spaceship" | "blackhole" | "whitehole" | "solarsystem"
@@ -35,6 +36,7 @@ const CURSOR_LIST: { id: CursorMode; label: string; icon: string }[] = [
 
 export default function Navbar({ mode, activeKey = '', scrollToSection }: NavbarProps) {
   const jump = useHyperjump()
+  const pathname = usePathname()
   const [open,       setOpen]       = useState(false)
   const [cursorOpen, setCursorOpen] = useState(false)
   const [cursorMode, setCursorMode] = useState<CursorMode>("pulsar")
@@ -50,6 +52,8 @@ export default function Navbar({ mode, activeKey = '', scrollToSection }: Navbar
     setCursorOpen(false)
     if (href) {
       jump(href)
+    } else if (pathname !== '/') {
+      jump('/')
     } else {
       jump(null, () => scrollToSection(key))
     }
