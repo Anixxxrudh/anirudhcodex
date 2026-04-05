@@ -1,6 +1,7 @@
 'use client'
 
 import Navbar from '@/components/Navbar'
+import CursorSystem from '@/components/CursorSystem'
 import { useHyperjump } from '@/hooks/useHyperjump'
 
 const COLLAB_ITEMS = [
@@ -47,6 +48,7 @@ export default function CollabPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#000', color: '#fff' }}>
+      <CursorSystem />
       <Navbar mode="about" scrollToSection={() => {}} />
 
       <main style={{ maxWidth: 900, margin: '0 auto', padding: '120px 24px 80px' }}>
