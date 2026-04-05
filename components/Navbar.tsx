@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
+import { useHyperjump } from "@/hooks/useHyperjump"
 
 type CursorMode = "pulsar" | "lightsaber" | "spaceship" | "blackhole" | "whitehole" | "solarsystem"
 
@@ -14,7 +15,11 @@ const NAV_ITEMS = [
   { key: "about",    label: "About"    },
   { key: "projects", label: "Projects" },
   { key: "physics",  label: "Physics"  },
+  { key: "timeline", label: "Timeline" },
+  { key: "skills",   label: "Skills"   },
   { key: "hobbies",  label: "Hobbies"  },
+  { key: "blog",     label: "Writing"  },
+  { key: "collab",   label: "Collab"   },
   { key: "contact",  label: "Contact"  },
 ]
 
@@ -28,6 +33,7 @@ const CURSOR_LIST: { id: CursorMode; label: string; icon: string }[] = [
 ]
 
 export default function Navbar({ mode, setMode, scrollToSection }: NavbarProps) {
+  const jump = useHyperjump()
   const [open,       setOpen]       = useState(false)
   const [cursorOpen, setCursorOpen] = useState(false)
   const [cursorMode, setCursorMode] = useState<CursorMode>("pulsar")
@@ -40,9 +46,9 @@ export default function Navbar({ mode, setMode, scrollToSection }: NavbarProps) 
 
   const go = (key: string) => {
     setMode(key)
-    scrollToSection(key)
     setOpen(false)
     setCursorOpen(false)
+    jump(null, () => scrollToSection(key))
   }
 
   const selectCursor = (m: CursorMode) => {

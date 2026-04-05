@@ -1327,11 +1327,11 @@ section {
 
 .navbar-desktop-btn {
   font-family: var(--font-display);
-  font-size: 0.6rem;
-  letter-spacing: 0.18em;
+  font-size: 0.54rem;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
   font-weight: 600;
-  padding: 7px 16px;
+  padding: 6px 11px;
   border-radius: 4px;
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.03);

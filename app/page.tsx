@@ -61,7 +61,6 @@ export default function Page() {
   const [kbTooltip,     setKbTooltip]     = useState(false)
   const [expandedCard,  setExpandedCard]  = useState<string | null>(null)
 
-  const transitioning   = useRef(false)
   const blackHoleRef    = useRef<BlackHoleHandle>(null)
 
   const snapRef  = useRef<HTMLDivElement>(null)
@@ -104,14 +103,6 @@ export default function Page() {
     map[section]?.current?.scrollIntoView({ behavior: "smooth" })
   }, [])
 
-  // ─── BLACK HOLE NAV (navbar clicks only) ─────────────────────────
-  const navigateWithTransition = useCallback((section: string) => {
-    if (transitioning.current) return
-    transitioning.current = true
-    blackHoleRef.current?.trigger()
-    setTimeout(() => scrollToSection(section), 380)
-    setTimeout(() => { transitioning.current = false }, 720)
-  }, [scrollToSection])
 
   // ─── DERIVE MODE FROM ACTIVE SECTION ─────────────────────────────
   useEffect(() => {
@@ -325,7 +316,7 @@ export default function Page() {
       <BackgroundCanvas mode={mode} scrollProgress={scrollProgress} />
 
       {/* Navbar */}
-      <Navbar setMode={setMode} mode={mode} scrollToSection={navigateWithTransition} />
+      <Navbar setMode={setMode} mode={mode} scrollToSection={scrollToSection} />
 
       {/* ⌘K hint */}
       <button

@@ -106,17 +106,20 @@ interface Dims {
 interface HyperjumpOverlayProps {
   active: boolean;
   targetHref: string;
+  onNavigate?: () => void;
   onComplete: () => void;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export function HyperjumpOverlay({ active, targetHref, onComplete }: HyperjumpOverlayProps) {
+export function HyperjumpOverlay({ active, targetHref, onNavigate, onComplete }: HyperjumpOverlayProps) {
   const router = useRouter();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
   const routerFiredRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
+  const onNavigateRef = useRef(onNavigate);
+  onNavigateRef.current = onNavigate;
   onCompleteRef.current = onComplete;
 
   useEffect(() => {
@@ -177,10 +180,14 @@ export function HyperjumpOverlay({ active, targetHref, onComplete }: HyperjumpOv
       const dt = now - lastTime;
       lastTime = now;
 
-      // Fire router push exactly once at 800 ms
+      // Fire navigation exactly once at 800 ms
       if (elapsed >= ROUTER_PUSH_MS && !routerFiredRef.current) {
         routerFiredRef.current = true;
-        router.push(targetHref);
+        if (targetHref) {
+          router.push(targetHref);
+        } else {
+          onNavigateRef.current?.();
+        }
       }
 
       drawFrame(ctx!, elapsed, dt, stars, express, isMobile, rng);
