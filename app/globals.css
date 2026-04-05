@@ -1344,6 +1344,15 @@ section {
   border-color: var(--border-hover);
   background: rgba(255,255,255,0.08);
 }
+.navbar-desktop-btn--page {
+  border-color: rgba(201, 168, 76, 0.3);
+  color: rgba(201, 168, 76, 0.7);
+}
+.navbar-desktop-btn--page:hover {
+  border-color: rgba(201, 168, 76, 0.7);
+  color: #C9A84C;
+  background: rgba(201, 168, 76, 0.06);
+}
 .navbar-desktop-btn.active {
   color: #fff;
   border-color: rgba(77, 184, 255, 0.6);

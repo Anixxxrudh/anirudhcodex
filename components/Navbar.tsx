@@ -12,16 +12,16 @@ type NavbarProps = {
 }
 
 const NAV_ITEMS = [
-  { key: "home",     label: "Home"     },
-  { key: "about",    label: "About"    },
-  { key: "projects", label: "Projects" },
-  { key: "physics",  label: "Physics"  },
-  { key: "hobbies",  label: "Hobbies"  },
-  { key: "timeline", label: "Timeline" },
-  { key: "skills",   label: "Skills"   },
-  { key: "blog",     label: "Writing"  },
-  { key: "collab",   label: "Collab"   },
-  { key: "contact",  label: "Contact"  },
+  { key: "home",        label: "Home"        },
+  { key: "about",       label: "About"       },
+  { key: "projects",    label: "Projects"    },
+  { key: "physics",     label: "Physics"     },
+  { key: "hobbies",     label: "Hobbies"     },
+  { key: "timeline",    label: "Timeline"    },
+  { key: "skills",      label: "Skills"      },
+  { key: "contact",     label: "Contact"     },
+  { key: "field-notes", label: "Field Notes", href: "/field-notes" },
+  { key: "collab",      label: "Collab",      href: "/collab"      },
 ]
 
 const CURSOR_LIST: { id: CursorMode; label: string; icon: string }[] = [
@@ -45,10 +45,14 @@ export default function Navbar({ mode, activeKey = '', scrollToSection }: Navbar
     if (saved && valid.includes(saved)) setCursorMode(saved)
   }, [])
 
-  const go = (key: string) => {
+  const go = (key: string, href?: string) => {
     setOpen(false)
     setCursorOpen(false)
-    jump(null, () => scrollToSection(key))
+    if (href) {
+      jump(href)
+    } else {
+      jump(null, () => scrollToSection(key))
+    }
   }
 
   const selectCursor = (m: CursorMode) => {
@@ -69,11 +73,11 @@ export default function Navbar({ mode, activeKey = '', scrollToSection }: Navbar
         <div className="navbar-divider" />
 
         {/* Desktop nav items */}
-        {NAV_ITEMS.map(({ key, label }) => (
+        {NAV_ITEMS.map(({ key, label, href }) => (
           <button
             key={key}
-            className={`navbar-desktop-btn${activeKey === key ? " active" : ""}`}
-            onClick={() => go(key)}
+            className={`navbar-desktop-btn${activeKey === key ? " active" : ""}${href ? " navbar-desktop-btn--page" : ""}`}
+            onClick={() => go(key, href)}
           >
             {label}
           </button>
@@ -123,12 +127,12 @@ export default function Navbar({ mode, activeKey = '', scrollToSection }: Navbar
       {/* Mobile overlay */}
       <div className={`mobile-overlay${open ? " mobile-overlay--open" : ""}`}>
         <nav className="mobile-nav">
-          {NAV_ITEMS.map(({ key, label }, i) => (
+          {NAV_ITEMS.map(({ key, label, href }, i) => (
             <button
               key={key}
               className="mobile-nav-item"
               style={{ animationDelay: `${i * 60}ms` }}
-              onClick={() => go(key)}
+              onClick={() => go(key, href)}
             >
               {label}
             </button>

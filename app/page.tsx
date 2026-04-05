@@ -10,14 +10,12 @@ import EasterEgg from "../components/EasterEgg"
 import HeroCanvas      from "../components/HeroCanvas"
 import AtomCanvas      from "../components/AtomCanvas"
 import SolarSystem     from "../components/SolarSystem"
-import BlogSection     from "../components/BlogSection"
 import ContactForm     from "../components/ContactForm"
 import ScrambleText    from "../components/ScrambleText"
 import TiltCard        from "../components/TiltCard"
 import QuotesSection   from "../components/QuotesSection"
 import CommandPalette    from "../components/CommandPalette"
 import ContextMenu       from "../components/ContextMenu"
-import CollabSection     from "../components/CollabSection"
 import CursorSystem      from "../components/CursorSystem"
 import RevealText        from "../components/RevealText"
 import BlackHoleTransition, { BlackHoleHandle } from "../components/BlackHoleTransition"
@@ -34,8 +32,6 @@ const SECTIONS = [
   { key: "hobbies",  label: "HOBBIES",  mode: "hobbies"  },
   { key: "timeline", label: "TIMELINE", mode: "home"     },
   { key: "skills",   label: "SKILLS",   mode: "physics"  },
-  { key: "blog",     label: "WRITING",  mode: "about"    },
-  { key: "collab",   label: "COLLAB",   mode: "about"    },
   { key: "quotes",   label: "QUOTES",   mode: "about"    },
   { key: "contact",  label: "CONTACT",  mode: "contact"  },
 ]
@@ -77,8 +73,6 @@ export default function Page() {
   const hobbiesRef  = useRef<HTMLElement>(null)
   const timelineRef = useRef<HTMLDivElement>(null)
   const skillsRef   = useRef<HTMLDivElement>(null)
-  const blogRef     = useRef<HTMLDivElement>(null)
-  const collabRef   = useRef<HTMLDivElement>(null)
   const quotesRef   = useRef<HTMLDivElement>(null)
   const contactRef  = useRef<HTMLElement>(null)
 
@@ -95,8 +89,6 @@ export default function Page() {
       hobbies:  hobbiesRef,
       timeline: timelineRef,
       skills:   skillsRef,
-      blog:     blogRef,
-      collab:   collabRef,
       quotes:   quotesRef,
       contact:  contactRef,
     } as Record<string, React.RefObject<HTMLElement | null>>
@@ -237,7 +229,7 @@ export default function Page() {
 
   // ─── KEYBOARD NAVIGATION ─────────────────────────────────────────
   useEffect(() => {
-    const KEYS = ["home","about","projects","physics","hobbies","timeline","skills","blog","collab","quotes","contact"]
+    const KEYS = ["home","about","projects","physics","hobbies","timeline","skills","quotes","contact"]
     let gPressed = false
     let gTimer: ReturnType<typeof setTimeout> | null = null
     let kbShownRef = false
@@ -695,15 +687,6 @@ export default function Page() {
             <SkillsSection />
           </div>
 
-          {/* ── WRITING / BLOG ──────────────────────────────────── */}
-          <div className="snap-section" ref={blogRef}>
-            <BlogSection />
-          </div>
-
-          {/* ── COLLAB ──────────────────────────────────────────── */}
-          <div ref={collabRef as React.RefObject<HTMLDivElement>} className="snap-section">
-            <CollabSection />
-          </div>
 
           {/* ── QUOTES ──────────────────────────────────────────── */}
           <div ref={quotesRef} className="snap-section" style={{ position: "relative" }}>
