@@ -1,4 +1,5 @@
 import { HyperjumpLink } from "@/components/HyperjumpLink"
+import { Metadata } from "next"
 import "../../globals.css"
 
 const HOBBIES: Record<string, { name: string; tagline: string; accent: string; description: string }> = {
@@ -38,6 +39,25 @@ const HOBBIES: Record<string, { name: string; tagline: string; accent: string; d
     accent: "#f472b6",
     description: "Digital and analog — visual work, illustration, and creative experiments. Art is where I think through things that don't fit into equations.",
   },
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ hobby: string }>
+}): Promise<Metadata> {
+  const { hobby } = await params
+  const data = HOBBIES[hobby]
+  if (!data) return {}
+  return {
+    title: `${data.name} — The Anirudh Protocol`,
+    description: data.description,
+    openGraph: {
+      title: `${data.name} — The Anirudh Protocol`,
+      description: data.description,
+      url: `https://theanirudhprotocol.vercel.app/hobbies/${hobby}`,
+    },
+  }
 }
 
 export function generateStaticParams() {

@@ -17,6 +17,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://theanirudhprotocol.vercel.app"),
   title: "The Anirudh Protocol — Physics, Energy, and Creative Systems",
   description:
     "A cinematic portfolio exploring astrophysics, renewable energy research, music, and outdoor exploration.",
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
     title: "The Anirudh Protocol — Physics, Energy, and Creative Systems",
     description:
       "A cinematic portfolio exploring astrophysics, renewable energy research, music, and outdoor exploration.",
-    url: "https://anirudhcodex.vercel.app",
+    url: "https://theanirudhprotocol.vercel.app",
     siteName: "The Anirudh Protocol",
     type: "website",
   },
